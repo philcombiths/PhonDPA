@@ -11,6 +11,7 @@ Superscript [a, e, i, o, u, v] are represented with diacritics above the segment
 *******************
 1.2 [1.8.18]
 dpa_script_v1-2.py
+
 -Orthography of diminutive forms changed from ' i' to '-i'.
 -IPA Target for telephone corrected from 'ˈtɛləˌfocn' to 'ˈtɛləˌfoʊn'
 Phon
@@ -21,6 +22,7 @@ Phon
 *******************
 1.3.0 (deprecated dipthong ligature version) [1.12.18]
 dpa_script_v1-3.py
+
 - NR and ɴʀ removed from IPA Actual column, replaced with "No response" in Notes
 - find/replace added [other_chars_translate_dict.csv] for dipthongs in IPA Actual so all instances have ligature ͡  (better alignment in Phon)
 - manual find/replace in [target_dict.csv] to add ligature ͡  to IPA Target transcriptions
@@ -28,12 +30,14 @@ dpa_script_v1-3.py
 *******************
 1.3.1 [1.17.2018]
 dpa_script_v1-3.py
+
 same as above (no change to script v1-3), but target_dict.csv and other_chars_translate_dict.csv reverted to prior version without ligatures for diphthongs.
 - NR and ɴʀ removed from IPA Actual column, replaced with "No response" in Notes
 
 *******************
 1.4 [1.27.2018]
 dpa_script_v1-3.py
+
 - Added superscript_chars_initial_2 and superscript_chars_initial_3 to repeat find-and-replace for initial raised segments (to capture instances where multiple raised segments occur word-initially. Modifications were made to these repeated versions to this aim.
 - superscript_chars_initial and superscript_chars_noninitial changed to OrderedDict to preserve original key order.
 - buffer output edited for accuracy and readability
@@ -68,6 +72,7 @@ Additional fixes in OrderedDicts:
 *******************
 1.5 [in progress] Latest version available on GitHub
 dpa_script.py
+
 
 # Disclaimer
 Phon_DPA was created by Philip Combiths, Jessica Barlow, and the Phonological Typologies Lab at San Diego State University.
