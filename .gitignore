@@ -1,7 +1,7 @@
 # Files to ignore on commit
-
+/errorChecking/*
 /excel/*
+/excel*/*
 /csv/*
 /info/*
 /draft files/*
-Check Transcriptsv1_4.csv

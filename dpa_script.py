@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # python v2.7
 """
-Phon DPA Script version 1.5
+## Phon DPA Script version 1.4.1
 
 The purpose of this script is to transform a directory of XLSX files 
 (containing phonetic transcriptions of single-word utterances) into CSV files 
@@ -14,7 +14,8 @@ This translation of data is designed to transfer original XLSX files from the
 Learnability Project into Phon format for phonological analysis:
 
 # Disclaimer
-Phon_DPA was created by Philip Combiths, Jessica Barlow, and the Phonological Typologies Lab at San Diego State University.
+Phon_DPA was created by Philip Combiths, Jessica Barlow, and the Phonological 
+Typologies Lab at San Diego State University.
 
 Archival data were retrieved from the Gierut / Learnability Project collection 
 of the IUScholarWorks repository at 
@@ -31,6 +32,7 @@ introduced in extraction or use of the archival data
 
 #### Step 0: Preliminaries
 import pandas as pd
+# May also require xlrd install as dependency for pandas
 import numpy as np
 import os
 import io
@@ -46,7 +48,9 @@ from contextlib import contextmanager
 os.chdir(os.path.dirname(sys.argv[0]))
 cwd = os.getcwd()        
 
-# Create contextmanager function that changes directory then returns to original directory upon completion
+# Create contextmanager function that changes directory then returns to 
+# original directory upon completion
+
 @contextmanager
 def change_dir(newdir):
     prevdir = os.getcwd()
@@ -55,13 +59,16 @@ def change_dir(newdir):
     finally:
         os.chdir(prevdir)
 
-#### Step 1: Get list of illegal characters. This step is optional if "other_chars_translate_dict.csv", "superscript_dict_initial.csv", and "superscript_dict_noninitial.csv" already exist in "dicts" directory.
+#### Step 1: Get list of illegal characters. This step is optional 
+#### if "other_chars_translate_dict.csv", "superscript_dict_initial.csv", 
+#### and "superscript_dict_noninitial.csv" already exist in "dicts" directory.
 
 print '**********Step 1: Get list of illegal characters**********'
 if os.path.isfile(os.path.join(cwd,r'dicts\other_chars_translate_dict.csv')):
     if os.path.isfile(os.path.join(cwd,r'dicts\superscript_dict_initial.csv')):
         if os.path.isfile(os.path.join(cwd,r'dicts\superscript_dict_noninitial.csv')):
-            if raw_input(r'other_chars_translate_dict.csv, superscript_dict_initial.csv, and superscript_dict_noninitial.csv found in directory dicts'+'\nSkip illegal characters list generation and proceed to Excel edits using these dictionaries?(Y/N)').capitalize()=='Y':
+            if raw_input(r'other_chars_translate_dict.csv, superscript_dict_initial.csv, and superscript_dict_noninitial.csv found in directory dicts'+
+                         '\nSkip illegal characters list generation and proceed to Excel edits using these dictionaries?(Y/N)').capitalize()=='Y':
                 skip = True
             else:
                 skip = False
@@ -134,7 +141,9 @@ if skip==False:
                 print '{} raw csv files complete'.format(name) 
         print "All raw csv files created in raw_csv folder"
     
-    ### Step 1b: Use raw csv files and ipa.xml from Phon source code to generate list of illegal characters to be replaced
+    ### Step 1b: Use raw csv files and ipa.xml from Phon source code to 
+    ### generate list of illegal characters to be replaced
+    
     print '**********Step 1b: Use raw csv files and ipa.xml from Phon source code to generate illegal_chars**********'
     
     raw_csv_dir = os.path.join(xls_dir,r'raw_csv')
@@ -316,7 +325,7 @@ with change_dir(os.path.normpath(xls_dir)):
         # Read Excel file as dictionary of Pandas DataFrames (data_xls) Key = sheet name
         try:
             data_xls = pd.read_excel(file, None)
-        except IOError:
+        except:
             print sys.exc_info()[1]
             print 'Unable to read {} {}'.format(file, type(file))
             print '{} skipped'.format(file)
@@ -339,7 +348,6 @@ with change_dir(os.path.normpath(xls_dir)):
             print "Saving in directory: ", os.getcwd()
             # Get list of sheets as xls_keys
             xls_keys = data_xls.keys()
-            # For each sheet in file...
             for sheet in data_xls:
                 # Define working Excel tab as DataFrame
                 df_sheet = data_xls[sheet]
@@ -361,7 +369,7 @@ with change_dir(os.path.normpath(xls_dir)):
                         elif col =='Word':                            
                             # Replace ' i' with "-i"
                             cur_rep_count = df_sheet[col].str.count(u' i', re.UNICODE).sum()
-                            sheet_rep_dict[' i Ortho'+'_to_-i'] += cur_rep_count                            
+                            sheet_rep_dict[u' i Ortho'+u'_to_-i'] += cur_rep_count                            
                             # replace all instances
                             df_sheet[col] = df_sheet[col].str.replace(u' i', u'-i', re.UNICODE)
                             if cur_rep_count > 0:
@@ -371,7 +379,7 @@ with change_dir(os.path.normpath(xls_dir)):
                             # Remove instances '\u0339' 
                             # cur_rep_count to track instances of replacements. In unicode
                             cur_rep_count = df_sheet[col].str.count(u'̹', re.UNICODE).sum()
-                            sheet_rep_dict['̹ Ortho'+'_removed'] += cur_rep_count                            
+                            sheet_rep_dict[u'̹ Ortho'+u'_removed'] += cur_rep_count                            
                             # replace all instances
                             df_sheet[col] = df_sheet[col].str.replace(u'̹', u'', re.UNICODE)
                             if cur_rep_count > 0:
@@ -381,7 +389,7 @@ with change_dir(os.path.normpath(xls_dir)):
                             # Replace 'ɑ' with blank
                             # cur_rep_count to track instances of replacements. In unicode
                             cur_rep_count = df_sheet[col].str.count(u'ɑ', re.UNICODE).sum()
-                            sheet_rep_dict[u'ɑ Ortho'+'_to_'+'a'] += cur_rep_count                            
+                            sheet_rep_dict[u'ɑ Ortho'+u'_to_'+u'a'] += cur_rep_count                            
                             # replace all instances
                             df_sheet[col] = df_sheet[col].str.replace(u'ɑ', u'a', re.UNICODE)
                             if cur_rep_count > 0:
@@ -391,7 +399,7 @@ with change_dir(os.path.normpath(xls_dir)):
                             # Replace ɢ in orthography with 'G'
                             # cur_rep_count to track instances of replacements. In unicode
                             cur_rep_count = df_sheet[col].str.count(u'ɢ', re.UNICODE).sum()
-                            sheet_rep_dict[u'ɢ Ortho'+'_to_'+'G'] += cur_rep_count                            
+                            sheet_rep_dict[u'ɢ Ortho'+u'_to_'+u'G'] += cur_rep_count                            
                             # replace all instances
                             df_sheet[col] = df_sheet[col].str.replace(u'ɢ', u'G', re.UNICODE)
                             if cur_rep_count > 0:
@@ -401,7 +409,7 @@ with change_dir(os.path.normpath(xls_dir)):
                             # Replace '\r' with blank
                             # cur_rep_count to track instances of replacements. In unicode
                             cur_rep_count = df_sheet[col].str.count(u'\n', re.UNICODE).sum()
-                            sheet_rep_dict[u'\n Ortho'+'_to_'+''] += cur_rep_count                            
+                            sheet_rep_dict[u'\n Ortho'+u'_to_'+u''] += cur_rep_count                            
                             # replace all instances
                             df_sheet[col] = df_sheet[col].str.replace(u'\n', '', re.UNICODE)
                             if cur_rep_count > 0:
@@ -411,7 +419,7 @@ with change_dir(os.path.normpath(xls_dir)):
                             # Replace 'thiers' with 'theirs'
                             # cur_rep_count to track instances of replacements. In unicode
                             cur_rep_count = df_sheet[col].str.count(r'^thiers$', re.UNICODE).sum()
-                            sheet_rep_dict[r'^thiers$'+'_to_'+'theirs'] += cur_rep_count                            
+                            sheet_rep_dict[ur'^thiers$'+u'_to_'+u'theirs'] += cur_rep_count                            
                             # replace all instances
                             df_sheet[col] = df_sheet[col].str.replace(r'^thiers$', u'theirs', re.UNICODE)
                             if cur_rep_count > 0:
@@ -421,7 +429,7 @@ with change_dir(os.path.normpath(xls_dir)):
                             # Replace 'moustach' with 'moustache'
                             # cur_rep_count to track instances of replacements. In unicode
                             cur_rep_count = df_sheet[col].str.count(r'^moustach$', re.UNICODE).sum()
-                            sheet_rep_dict[r'^moustach$'+'_to_'+'moustache'] += cur_rep_count                            
+                            sheet_rep_dict[ur'^moustach$'+u'_to_'+u'moustache'] += cur_rep_count                            
                             # replace all instances
                             df_sheet[col] = df_sheet[col].str.replace(r'^moustach$', u'moustache', re.UNICODE)
                             if cur_rep_count > 0:
@@ -431,7 +439,7 @@ with change_dir(os.path.normpath(xls_dir)):
                             # Replace 'loag' with 'loaf'
                             # cur_rep_count to track instances of replacements. In unicode
                             cur_rep_count = df_sheet[col].str.count(r'^loag$', re.UNICODE).sum()
-                            sheet_rep_dict[r'^loag$'+'_to_'+'loaf'] += cur_rep_count                            
+                            sheet_rep_dict[ur'^loag$'+u'_to_'+u'loaf'] += cur_rep_count                            
                             # replace all instances
                             df_sheet[col] = df_sheet[col].str.replace(r'^loag$', u'loaf', re.UNICODE)
                             if cur_rep_count > 0:
@@ -500,7 +508,7 @@ with change_dir(os.path.normpath(xls_dir)):
                             # Replace [] with blank
                             # cur_rep_count to track instances of replacements. In unicode
                             cur_rep_count = df_sheet[col].str.count('\[\]', re.UNICODE).sum()
-                            sheet_rep_dict['\[\]'+'_to_'+''] += cur_rep_count                            
+                            sheet_rep_dict[u'\[\]'+u'_to_'+u''] += cur_rep_count                            
                             # replace all instances of space ' {1,2}(?! )' with blank.
                             df_sheet[col] = df_sheet[col].str.replace('\[\]', '', re.UNICODE)
                             if cur_rep_count > 0:
@@ -513,7 +521,7 @@ with change_dir(os.path.normpath(xls_dir)):
                             for key in other_chars_dict:
                                 # cur_rep_count to track instances of replacements. In unicode
                                 cur_rep_count = df_sheet[col].str.count(unicode(key), re.UNICODE).sum()
-                                sheet_rep_dict[key+'_to_'+ other_chars_dict[key]] += cur_rep_count             
+                                sheet_rep_dict[key+u'_to_'+ other_chars_dict[key]] += cur_rep_count             
                                 # replace all instances of dictionary key with corresponding value. In unicode
                                 df_sheet[col] = df_sheet[col].str.replace(unicode(key), unicode(other_chars_dict[key]), re.UNICODE)
                                 if cur_rep_count > 0:
@@ -525,7 +533,7 @@ with change_dir(os.path.normpath(xls_dir)):
                             mask = df_sheet.filter(['Word',col,'NumProductions'], axis=1).NumProductions == ''                           
                             # cur_rep_count to track instances of replacements. In unicode
                             cur_rep_count = df_sheet.loc[mask, col].str.count(' ', re.UNICODE).sum()
-                            sheet_rep_dict[' '+'_to_'+''] += cur_rep_count                            
+                            sheet_rep_dict[u' '+u'_to_'+u''] += cur_rep_count                            
                             # replace all instances of space ' ' with blank.
                             df_sheet.loc[mask, col] = df_sheet.loc[mask, col].str.replace(' ', '', re.UNICODE) 
                             if cur_rep_count > 0:
@@ -536,7 +544,7 @@ with change_dir(os.path.normpath(xls_dir)):
                             mask = df_sheet.filter(['Word',col,'NumProductions'], axis=1).NumProductions != ''
                             # cur_rep_count to track instances of replacements. In unicode
                             cur_rep_count = df_sheet.loc[mask, col].str.count(' {1,3}(?! )', re.UNICODE).sum()
-                            sheet_rep_dict[' {1,3}(?! )'+'_to_'+''] += cur_rep_count                            
+                            sheet_rep_dict[u' {1,3}(?! )'+u'_to_'+u''] += cur_rep_count                            
                             # replace all instances of space ' {1,2}(?! )' with blank.
                             df_sheet.loc[mask, col] = df_sheet.loc[mask, col].str.replace(' {1,3}(?! )', '', re.UNICODE)                             
                             if cur_rep_count > 0:
@@ -547,7 +555,7 @@ with change_dir(os.path.normpath(xls_dir)):
                             for key in superscript_dict_initial:
                                 # cur_rep_count to track instances of replacements. In unicode
                                 cur_rep_count = df_sheet[col].str.count(unicode(key), re.UNICODE).sum()
-                                sheet_rep_dict[key+'_to_'+ superscript_dict_initial[key]] += cur_rep_count             
+                                sheet_rep_dict[key+u'_to_'+ superscript_dict_initial[key]] += cur_rep_count             
                                 # replace all instances of dictionary key with corresponding value. In unicode
                                 df_sheet[col] = df_sheet[col].str.replace(unicode(key), unicode(superscript_dict_initial[key]), re.UNICODE)                               
                                 if cur_rep_count > 0:
@@ -558,7 +566,7 @@ with change_dir(os.path.normpath(xls_dir)):
                             for key in superscript_dict_initial2:
                                 # cur_rep_count to track instances of replacements. In unicode
                                 cur_rep_count = df_sheet[col].str.count(unicode(key), re.UNICODE).sum()
-                                sheet_rep_dict[key+'_to_'+ superscript_dict_initial2[key]] += cur_rep_count             
+                                sheet_rep_dict[key+u'_to_'+ superscript_dict_initial2[key]] += cur_rep_count             
                                 # replace all instances of dictionary key with corresponding value. In unicode
                                 df_sheet[col] = df_sheet[col].str.replace(unicode(key), unicode(superscript_dict_initial2[key]), re.UNICODE)                               
                                 if cur_rep_count > 0:
@@ -569,7 +577,7 @@ with change_dir(os.path.normpath(xls_dir)):
                             for key in superscript_dict_initial3:
                                 # cur_rep_count to track instances of replacements. In unicode
                                 cur_rep_count = df_sheet[col].str.count(unicode(key), re.UNICODE).sum()
-                                sheet_rep_dict[key+'_to_'+ superscript_dict_initial3[key]] += cur_rep_count             
+                                sheet_rep_dict[key+u'_to_'+ superscript_dict_initial3[key]] += cur_rep_count             
                                 # replace all instances of dictionary key with corresponding value. In unicode
                                 df_sheet[col] = df_sheet[col].str.replace(unicode(key), unicode(superscript_dict_initial3[key]), re.UNICODE)                               
                                 if cur_rep_count > 0:
@@ -580,7 +588,7 @@ with change_dir(os.path.normpath(xls_dir)):
                             for key in superscript_dict_noninitial:
                                 # cur_rep_count to track instances of replacements. In unicode
                                 cur_rep_count = df_sheet[col].str.count(unicode(key), re.UNICODE).sum()
-                                sheet_rep_dict[key+'_to_'+ superscript_dict_noninitial[key]] += cur_rep_count             
+                                sheet_rep_dict[key+u'_to_'+ superscript_dict_noninitial[key]] += cur_rep_count             
                                 # replace all instances of dictionary key with corresponding value. In unicode
                                 df_sheet[col] = df_sheet[col].str.replace(unicode(key), unicode(superscript_dict_noninitial[key]), re.UNICODE)                               
                                 if cur_rep_count > 0:
@@ -664,11 +672,11 @@ with change_dir(os.path.normpath(xls_dir)):
                 df_replace_counts.T.to_csv('replacement_counts.csv', encoding = 'utf-8')
     print 'replacement_counts.csv created'
                             
-                            ### Other features to implement in future:                     
-                            # Add info from notes_dict to participant metadata/phon corpus, CA
-                            # Add CA from CA_Dict to session metadata
-                            # If participant_num in notes_dict, insert dictionary entry to notes Tier. Also add to corpus notes
-                            # Check for errors against illegal characters key. Search for illegal characters in DataFrame. Create error log                                                                                                                                                                                                                                                                                    
+    ### Other features to implement in future:                     
+    # Add info from notes_dict to participant metadata/phon corpus, CA
+    # Add CA from CA_Dict to session metadata
+    # If participant_num in notes_dict, insert dictionary entry to notes Tier. Also add to corpus notes
+    # Check for errors against illegal characters key. Search for illegal characters in DataFrame. Create error log                                                                                                                                                                                                                                                                                    
     
     # Create csv of unique orthography items
     with change_dir(os.path.join(cwd)):                                 
@@ -680,11 +688,14 @@ with change_dir(os.path.normpath(xls_dir)):
             print 'info/{} directory already created.'.format(name)
         # Change to new subdirectory
         with change_dir(os.path.join(cwd, 'info')):                                            
-                pd.DataFrame(word_list).to_csv('word_list.csv', header = ['Orthography'], encoding = 'utf-8', index = False)
+                pd.DataFrame(word_list).to_csv('word_list.csv', header = ['Orthography'], 
+                            encoding = 'utf-8', index = False)
     print 'word_list.csv created'    
 
-### Unfinished code: check for illegal characters. Currently accomplished with Phon CheckTranscript
-                
+
+### Unfinished code below: check for illegal characters. 
+### Currently accomplished with Phon CheckTranscript
+    
     """                
     ### Look for illegal_chars 
     # Create empty DataFrame for illegal_char_count dictaries for each participant
