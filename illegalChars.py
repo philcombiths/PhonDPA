@@ -12,8 +12,6 @@ import sys
 import xml.etree.ElementTree as etree
 from contextlib import contextmanager
 
-      
-
 
 def illegalChars():    
     # Set default directory to location of script

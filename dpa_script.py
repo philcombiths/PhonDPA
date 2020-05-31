@@ -43,6 +43,7 @@ from collections import OrderedDict
 from contextlib import contextmanager
 from illegalChars import illegalChars
 
+
 # Set default directory to location of script
 os.chdir(os.path.dirname(sys.argv[0]))
 cwd = os.getcwd()        
