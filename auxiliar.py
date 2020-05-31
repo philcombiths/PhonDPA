@@ -4,14 +4,15 @@ Created on Sat May 30 16:14:18 2020
 
 @author: Philip
 """
+from __future__ import absolute_import
+from __future__ import print_function
 import os
 import sys
 from contextlib import contextmanager
 import pandas as pd
 # May also require xlrd install as dependency for pandas
-import unicodecsv as csv
-import io
-import re
+import regex as re
+from six.moves import input
 
 
 
@@ -32,7 +33,7 @@ def genRawCSV():
             os.chdir(prevdir)
         
     ### Step 1a: Create raw csv files
-    print '**********Create raw, untranslated csv files from xls files**********'
+    print('**********Create raw, untranslated csv files from xls files**********')
     # Preset xls_dir
     xls_dir = os.path.join(cwd,r'excel')
     root_dir = cwd
@@ -40,18 +41,18 @@ def genRawCSV():
     try:
         xls_dir
     except NameError:
-        xls_dir = os.path.normpath(raw_input('xls directory not specified. Enter xls directory path: '))
+        xls_dir = os.path.normpath(input('xls directory not specified. Enter xls directory path: '))
     
     with change_dir(os.path.normpath(xls_dir)):
-        print "XLS Directory set to: ", os.getcwd()
+        print("XLS Directory set to: ", os.getcwd())
         # for each file in list of files in directory xls_dir...
         for file in os.listdir(xls_dir):
             # Read Excel file as dictionary of Pandas DataFrames (data_xls) Key = sheet name
             try:
                 data_xls = pd.read_excel(file, None)
             except:
-                print sys.exc_info()[1]
-                print 'Unable to read {}'.format(file)
+                print(sys.exc_info()[1])
+                print('Unable to read {}'.format(file))
             # Extract participant number from file name
             name = file[:file.find('_')]
             with change_dir(os.path.normpath(root_dir)):            
@@ -59,13 +60,13 @@ def genRawCSV():
                 try:
                     os.makedirs(os.path.join('raw_csv', name))
                 except WindowsError:
-                    print sys.exc_info()[1]
-                    print 'raw_csv/{} directory already created.'.format(name)
+                    print(sys.exc_info()[1])
+                    print('raw_csv/{} directory already created.'.format(name))
                 # Change to new subdirectory
                 with change_dir(os.path.join(root_dir, 'raw_csv', name)):
-                    print "Working in directory: ", os.getcwd()
+                    print("Working in directory: ", os.getcwd())
                     # Get list of sheets as xls_keys
-                    xls_keys = data_xls.keys()
+                    xls_keys = list(data_xls.keys())
                     # For each sheet in file...
                     for sheet in data_xls:
                         # create Probe:CA dictionary
@@ -73,14 +74,14 @@ def genRawCSV():
                             CA_dict = data_xls[sheet].set_index('Probe').T.to_dict('records')
                         # Exclude 'Copyright' sheet
                         if sheet == 'Copyright':
-                            print name, "Copyright sheet excluded"
+                            print(name, "Copyright sheet excluded")
                         else: 
                             # Save DataFrame for sheet to CSV. Set name, encode as UTF-8, omit row index
                             data_xls[sheet].to_csv(sheet +'.csv', encoding = 'utf-8', index = False)
-                    print '{} raw csv files complete'.format(name) 
-    print "All raw csv files created in raw_csv folder"
+                    print('{} raw csv files complete'.format(name)) 
+    print("All raw csv files created in raw_csv folder")
 
-genRawCSV()
+
 
 def findCompoundPhones():
     """
@@ -98,11 +99,11 @@ def findCompoundPhones():
         try:
             data_xls = pd.read_excel(os.path.join(xlsDir, fName), None)
         except:
-            print sys.exc_info()[1]
-            print 'Unable to read {} {}'.format(fName, type(fName))
-            print '{} skipped'.format(fName)
+            print(sys.exc_info()[1])
+            print('Unable to read {} {}'.format(fName, type(fName)))
+            print('{} skipped'.format(fName))
             break        
-        xls_keys = data_xls.keys()
+        xls_keys = list(data_xls.keys())
         for sheet in data_xls:
             # Define working Excel tab as DataFrame
             df_sheet = data_xls[sheet]
@@ -124,25 +125,40 @@ def findCompoundPhones():
                             for i in item:
                                 result.append(i)
     return set(result)
+
+def combiningStrip(text):
+    assert type(text) is str   
+    
+    unicodeBlockList = [r'\p{InCombining_Diacritical_Marks_for_Symbols}',
+                        r'\p{InSuperscripts_and_Subscripts}',
+                        r'\p{InCombining_Diacritical_Marks}',
+                        r'\p{InSpacing_Modifier_Letters}',
+                        r'\p{InCombining_Diacritical_Marks_Extended}'
+                        r'\p{InCombining_Diacritical_Marks_Supplement}']
+
+    pattern = r'(' + r'|'.join(unicodeBlockList) + r')'
+    pattern = re.compile(pattern)
+    # re.search(pattern, text)
+    result = re.subn(pattern, '', text)
+    return result[0]
+
+### Testing
+
+
 """
-    text = []
-    for dirName, subDirList, fileList in os.walk(csvDir):
-        for fName in fileList:
-            with io.open(os.path.join(dirName, fName), mode='r', 
-                         encoding='utf-8') as csvfile:
-                reader = csv.reader(csvfile)
-                for i, row in enumerate(reader):
-                    if i == 1:
-                        continue
-                    else:
-                        text.append(row[2:])
-    return text
-"""
+text = '◌̐  fg ak ◌̬sk gj◌⃰'
+result = combiningStrip(text)
+
+genRawCSV()
 
 allText = findCompoundPhones()
+
+
+
 with open('compoundPhones.csv', 'wb') as csvOutput:
     writer = csv.writer(csvOutput, encoding = 'utf-8')
     writer.writerow(list(allText))
+"""
                 
     
     
