@@ -35,7 +35,7 @@ same as above (no change to script v1-3), but target_dict.csv and other_chars_tr
 
 *******************
 1.4 [1.27.2018]
-dpa_script_v1-3.py
+dpa_script_v1-4.py
 
 - Added superscript_chars_initial_2 and superscript_chars_initial_3 to repeat find-and-replace for initial raised segments (to capture instances where multiple raised segments occur word-initially. Modifications were made to these repeated versions to this aim.
 - superscript_chars_initial and superscript_chars_noninitial changed to OrderedDict to preserve original key order.
@@ -68,6 +68,11 @@ dpa_script_v1-3.py
 		Find: (?<!^)ⁿ
 		Replace: ⁿ̵
 
+1.4.1 [5.30.20]
+	Fixed to OrderDict (initial_superscript):
+		Find: (?:^|\s)ᵇ([̴̡̹̪̥̩̜̰͔͒̊͋̄̈̚̕˭̣̃˺]*)
+		Replace: ᵇ\1̵
+	
 *******************
 1.5 [in progress] Latest version available on GitHub
 dpa_script.py

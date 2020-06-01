@@ -2,7 +2,9 @@
 """
 Created on Sat May 30 16:14:18 2020
 
-@author: Philip
+@author: Philip Combiths
+
+Phon DPA Script Auxiliar Functions
 """
 from __future__ import absolute_import
 from __future__ import print_function
@@ -13,10 +15,23 @@ import pandas as pd
 # May also require xlrd install as dependency for pandas
 import regex as re
 from six.moves import input
-
+import unicodecsv as csv
 
 
 def genRawCSV():    
+    """
+    From a directory of xls files from the Developmental Phonologies Archive
+    (DPA; Gierut, 2015), extracts probe transcription data and exports as csv files,
+    organized by participant ID.
+    
+    Requires:
+        'xls' directory containing DPA xls files in current working directory
+    
+    Generates:
+        'raw_csv' directory containing data in csv files, in current working 
+        directory
+    """
+    
     # Set default directory to location of script
     os.chdir(os.path.dirname(sys.argv[0]))
     cwd = os.getcwd()        
@@ -58,12 +73,12 @@ def genRawCSV():
             with change_dir(os.path.normpath(root_dir)):            
                 # Create new subdirectory to place csv files
                 try:
-                    os.makedirs(os.path.join('raw_csv', name))
+                    os.makedirs(os.path.join('rawCSV', name))
                 except WindowsError:
                     print(sys.exc_info()[1])
-                    print('raw_csv/{} directory already created.'.format(name))
+                    print('rawCSV/{} directory already created.'.format(name))
                 # Change to new subdirectory
-                with change_dir(os.path.join(root_dir, 'raw_csv', name)):
+                with change_dir(os.path.join(root_dir, 'rawCSV', name)):
                     print("Working in directory: ", os.getcwd())
                     # Get list of sheets as xls_keys
                     xls_keys = list(data_xls.keys())
@@ -71,28 +86,60 @@ def genRawCSV():
                     for sheet in data_xls:
                         # create Probe:CA dictionary
                         if sheet == 'Probe Schedule':
-                            CA_dict = data_xls[sheet].set_index('Probe').T.to_dict('records')
+                            continue
                         # Exclude 'Copyright' sheet
                         if sheet == 'Copyright':
-                            print(name, "Copyright sheet excluded")
+                            continue
                         else: 
                             # Save DataFrame for sheet to CSV. Set name, encode as UTF-8, omit row index
                             data_xls[sheet].to_csv(sheet +'.csv', encoding = 'utf-8', index = False)
-                    print('{} raw csv files complete'.format(name)) 
-    print("All raw csv files created in raw_csv folder")
+                    print('{} raw csv files complee'.format(name)) 
+    print("All raw csv files created in rawCSV folder")
 
+
+def combiningStrip(text):
+    """
+    From a string, remove combining diacritics and modifiers.
+    
+    Parameters:
+        text : string
+    
+    Return string with combining characters removed
+    """
+    assert type(text) is str   
+    
+    unicodeBlockList = [r'\p{InCombining_Diacritical_Marks_for_Symbols}',
+                        r'\p{InSuperscripts_and_Subscripts}',
+                        r'\p{InCombining_Diacritical_Marks}',
+                        r'\p{InSpacing_Modifier_Letters}',
+                        r'\p{InCombining_Diacritical_Marks_Extended}'
+                        r'\p{InCombining_Diacritical_Marks_Supplement}']
+
+    pattern = r'(' + r'|'.join(unicodeBlockList) + r')'
+    pattern = re.compile(pattern)
+    # re.search(pattern, text)
+    result = re.subn(pattern, '', text)
+    
+    return result[0]
 
 
 def findCompoundPhones():
     """
-    Locate all unique compound phones from original dataset.
+    From a directory of xls files from the Developmental Phonologies Archive
+    (DPA; Gierut, 2015), return all unique compound phones.
+    
+    Requires:
+        'xls' directory containing DPA xls files in current working directory
+        combiningStrip()
+    
+    Return list of unique compound phones 
     """
     # Set default directory to location of script
     os.chdir(os.path.dirname(sys.argv[0]))
     cwd = os.getcwd()        
     rootDir = cwd
     xlsDir = os.path.join(rootDir, r'excel')
-    result = []
+    result = set()
     # for each file in list of files in directory xls_dir...
     for fName in os.listdir(xlsDir):        
         # Read Excel file as dictionary of Pandas DataFrames (data_xls) Key = sheet name
@@ -117,30 +164,29 @@ def findCompoundPhones():
                         continue
                     if col == 'Word':
                         continue
-                    dfReduced = df_sheet[col].str.findall(r'\S\S', re.UNICODE)
+                    df_sheet[col] = df_sheet[col].map(lambda x: combiningStrip(str(x)))
+                    dfReduced = df_sheet[col].str.findall(r'\S+', re.UNICODE)
                     for item in dfReduced:
                         if type(item) == str:
-                            result.append(item)
+                            result.add(item)
                         if type(item) == list:
                             for i in item:
-                                result.append(i)
-    return set(result)
-
-def combiningStrip(text):
-    assert type(text) is str   
+                                result.add(i)
+        print(f'{fName} searched')
+        
+    # Save result to csv in 'info' directory
+    try:
+        os.makedirs('info')
+        print('Created:', os.path.join(os.getcwd(),'info'))
+    except WindowsError:
+        pass
+    with open(os.path.join('info','compoundPhones.csv'), 'wb') as csvOutput:
+        writer = csv.writer(csvOutput, encoding = 'utf-8')
+        writer.writerow(list(set(result)))
     
-    unicodeBlockList = [r'\p{InCombining_Diacritical_Marks_for_Symbols}',
-                        r'\p{InSuperscripts_and_Subscripts}',
-                        r'\p{InCombining_Diacritical_Marks}',
-                        r'\p{InSpacing_Modifier_Letters}',
-                        r'\p{InCombining_Diacritical_Marks_Extended}'
-                        r'\p{InCombining_Diacritical_Marks_Supplement}']
+    return list(result)
 
-    pattern = r'(' + r'|'.join(unicodeBlockList) + r')'
-    pattern = re.compile(pattern)
-    # re.search(pattern, text)
-    result = re.subn(pattern, '', text)
-    return result[0]
+findCompoundPhones()
 
 ### Testing
 

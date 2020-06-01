@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # python v2.7, 3.8 compatible
 """
-## Phon DPA Script version 1.4.1
+## Phon DPA Script version 1.4.3
 
 The purpose of this script is to transform a directory of XLSX files 
 (containing phonetic transcriptions of single-word utterances) into CSV files 
