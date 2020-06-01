@@ -17,6 +17,61 @@ import regex as re
 from six.moves import input
 import unicodecsv as csv
 
+# Establish origin directory and context navigation
+os.chdir(os.path.dirname(sys.argv[0])) 
+owd = os.getcwd()
+
+
+@contextmanager
+def enter_dir(newdir):
+    prevdir = os.getcwd()
+    try:
+        yield os.chdir(newdir) 
+    finally:
+        os.chdir(prevdir)
+        
+        
+@contextmanager
+def change_dir(newdir):
+    prevdir = os.getcwd()
+    try:
+        yield os.chdir(os.path.expanduser(newdir)) 
+    finally:
+        os.chdir(prevdir)
+
+
+def accessExcel(xlsDirName):
+    
+    """
+    From a directory of xls files in the current working directory, returns 
+    a dictionary containing each Excel sheet/tab as a pandas dataframe.
+    
+    Parameters:
+        xlsDirName : a directory name of xls files named '####_PHON.xls'
+    
+    Returns:
+        data_xls : a dict {#### : DataFrame}
+    """
+
+    xlsDict = {}
+    with enter_dir(xlsDirName):
+        print("XLS Directory set to: ", os.getcwd())
+        # for each file in list of files in directory xls_dir...
+        for file in os.listdir():
+            # Read Excel file as dictionary of Pandas DataFrames (data_xls) Key = sheet name
+            try:
+                data_xls = pd.read_excel(file, None)
+            except:
+                print(sys.exc_info()[1])
+                print('Unable to read {}'.format(file))
+                continue
+            # Extract participant number from file name
+            name = file[:file.find('_')]
+            # Get list of sheets as xls_keys
+            xls_keys = list(data_xls.keys())
+            xlsDict.update({name : data_xls})
+    return xlsDict
+
 
 def genRawCSV():    
     """
@@ -37,8 +92,7 @@ def genRawCSV():
     cwd = os.getcwd()        
     
     # Create contextmanager function that changes directory then returns to 
-    # original directory upon completion
-    
+    # original directory upon completion    
     @contextmanager
     def change_dir(newdir):
         prevdir = os.getcwd()
@@ -93,7 +147,7 @@ def genRawCSV():
                         else: 
                             # Save DataFrame for sheet to CSV. Set name, encode as UTF-8, omit row index
                             data_xls[sheet].to_csv(sheet +'.csv', encoding = 'utf-8', index = False)
-                    print('{} raw csv files complee'.format(name)) 
+                    print('{} raw csv files complete'.format(name)) 
     print("All raw csv files created in rawCSV folder")
 
 
@@ -122,17 +176,119 @@ def combiningStrip(text):
     
     return result[0]
 
+def extractSegments(segmentType):
+    assert segmentType in ['phones', 'compounds', 'characters'], """segmentType must be specified as:\n\t'phones' for all unitary and multi-component phones with diacritics\n\t'compounds' for compound phones only\n\t'characters' for all characters"""
+    
+    xlsDict = accessExcel('excel')
+    result = set() 
+    for xls in xlsDict:
+        for sheet in xlsDict[xls]:
+            # Define working Excel tab as DataFrame
+            dfSheet = xlsDict[xls][sheet]
+            
+            # Skip Copyright and Probe schedule sheets
+            if sheet == 'Copyright' or sheet == 'Probe Schedule':
+                continue
+            else:                
+                for col in dfSheet.columns:
+                    if col == 'Target':
+                        continue
+                    if col == 'Word':
+                        continue
+                    else:
+                        if segmentType == 'phones':
+                            dfSheetIPA = dfSheet[col].str.findall(r'\S+', re.UNICODE)
+                        if segmentType == 'compounds':
+                            dfSheetIPA = dfSheet[col].map(lambda x: combiningStrip(str(x)))
+                            dfSheetIPA = dfSheetIPA.str.findall(r'\S{2,}', re.UNICODE)
+                        if segmentType == 'characters':
+                            dfSheetIPA = dfSheet[col].str.findall(r'\S', re.UNICODE)
+                    for item in dfSheetIPA:
+                        if type(item) == str:
+                            result.add(item)
+                        if type(item) == list:
+                            for i in item:
+                                result.add(i)
+        print(f'{xls} searched')
+        
+    # Save result to csv in 'info' directory
+    try:
+        os.makedirs('info')
+        print('Created:', os.path.join(os.getcwd(),'info'))
+    except WindowsError:
+        pass
+    with open(os.path.join('info',f'{segmentType}.csv'), 'wb') as csvOutput:
+        writer = csv.writer(csvOutput, encoding = 'utf-8')
+        for e in list(set(result)):
+            writer.writerow([e])
+    print(f"'{segmentType}.csv' created in 'info' directory.")
+    return list(result)
 
-def findCompoundPhones():
+extractSegments('characters')
+
+def extractFullPhones():
+    
     """
     From a directory of xls files from the Developmental Phonologies Archive
-    (DPA; Gierut, 2015), return all unique compound phones.
+    (DPA; Gierut, 2015), return all unique phones/compounds and save to csv.
     
     Requires:
         'xls' directory containing DPA xls files in current working directory
         combiningStrip()
     
-    Return list of unique compound phones 
+    Return list of unique compound phones and save to csv
+    """
+
+    xlsDict = accessExcel('excel')
+    result = set() 
+    for xls in xlsDict:
+        for sheet in xlsDict[xls]:
+            # Define working Excel tab as DataFrame
+            dfSheet = xlsDict[xls][sheet]
+            
+            # Skip Copyright and Probe schedule sheets
+            if sheet == 'Copyright' or sheet == 'Probe Schedule':
+                continue
+            else:                
+                for col in dfSheet.columns:
+                    if col == 'Target':
+                        continue
+                    if col == 'Word':
+                        continue
+                    else:
+                        # dfSheetIPA = dfSheet[col].map(lambda x: str(x))
+                        dfSheetIPA = dfSheet[col].str.findall(r'\S+', re.UNICODE)
+                    for item in dfSheetIPA:
+                        if type(item) == str:
+                            result.add(item)
+                        if type(item) == list:
+                            for i in item:
+                                result.add(i)
+        print(f'{xls} searched')
+        
+    # Save result to csv in 'info' directory
+    try:
+        os.makedirs('info')
+        print('Created:', os.path.join(os.getcwd(),'info'))
+    except WindowsError:
+        pass
+    with open(os.path.join('info','fullPhones.csv'), 'wb') as csvOutput:
+        writer = csv.writer(csvOutput, encoding = 'utf-8')
+        for e in list(set(result)):
+            writer.writerow([e])
+    print("'fullPhones.csv' created in 'info' directory.")
+    return list(result)
+
+def extractCompoundPhones():
+    """
+    From a directory of xls files from the Developmental Phonologies Archive
+    (DPA; Gierut, 2015), return all unique compound phones and save to csv.
+    
+    Requires:
+        'xls' directory containing DPA xls files in current working directory
+        combiningStrip()
+    
+    Return list of unique compound phones and save to csv
     """
     # Set default directory to location of script
     os.chdir(os.path.dirname(sys.argv[0]))
@@ -165,7 +321,7 @@ def findCompoundPhones():
                     if col == 'Word':
                         continue
                     df_sheet[col] = df_sheet[col].map(lambda x: combiningStrip(str(x)))
-                    dfReduced = df_sheet[col].str.findall(r'\S+', re.UNICODE)
+                    dfReduced = df_sheet[col].str.findall(r'\S{2,}', re.UNICODE)
                     for item in dfReduced:
                         if type(item) == str:
                             result.add(item)
@@ -186,7 +342,9 @@ def findCompoundPhones():
     
     return list(result)
 
-findCompoundPhones()
+# ToDo: 
+# identify location of unique segment combinations
+# get list of by-participant unique transcription rules                       
 
 ### Testing
 
