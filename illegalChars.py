@@ -14,6 +14,7 @@ import sys
 import xml.etree.ElementTree as etree
 from contextlib import contextmanager
 from six.moves import input
+from auxiliar import genRawCSV
 
 
 def illegalChars():    
@@ -50,69 +51,27 @@ def illegalChars():
     csv_char_set = set()
     illegal_chars = []
     
-    ### Step 1a: Create raw csv files
-    print('**********Step 1a: Create raw, untranslated csv files**********')
-    
+    ### Create raw csv files if not in directory
+    if os.path.isdir('rawCSV'):
+        print("'rawCSV' folder already created.")
+    else:
+        genRawCSV()
+        
     # Preset xls_dir
     xls_dir = os.path.join(cwd,r'excel')
-    # If directory is not preset, get user input
-    try:
-        xls_dir
-    except NameError:
-        xls_dir = os.path.normpath(input('xls directory not specified. Enter xls directory path: '))
     
-    with change_dir(os.path.normpath(xls_dir)):
-        print("XLS Directory set to: ", os.getcwd())
-        # for each file in list of files in directory xls_dir...
-        for file in os.listdir(xls_dir):
-            # Read Excel file as dictionary of Pandas DataFrames (data_xls) Key = sheet name
-            try:
-                data_xls = pd.read_excel(file, None)
-            except:
-                print(sys.exc_info()[1])
-                print('Unable to read {}'.format(file))
-            # Extract participant number from file name
-            name = file[:file.find('_')]
-            # Create new subdirectory to place csv files
-            try:
-                os.makedirs(os.path.join('raw_csv', name))
-            except WindowsError:
-                print(sys.exc_info()[1])
-                print('raw_csv/{} directory already created.'.format(name))
-            # Change to new subdirectory
-            with change_dir(os.path.join(xls_dir, 'raw_csv', name)):
-                print("Working in directory: ", os.getcwd())
-                # Get list of sheets as xls_keys
-                xls_keys = list(data_xls.keys())
-                # For each sheet in file...
-                for sheet in data_xls:
-                    # create Probe:CA dictionary
-                    if sheet == 'Probe Schedule':
-                        CA_dict = data_xls[sheet].set_index('Probe').T.to_dict('records')
-                    # Exclude 'Copyright' sheet
-                    if sheet == 'Copyright':
-                        print(name, "Copyright sheet excluded")
-                    else: 
-                        # Save DataFrame for sheet to CSV. Set name, encode as UTF-8, omit row index
-                        data_xls[sheet].to_csv(sheet +'.csv', encoding = 'utf-8', index = False)
-                print('{} raw csv files complete'.format(name)) 
-        print("All raw csv files created in raw_csv folder")
-    
-    ### Step 1b: Use raw csv files and ipa.xml from Phon source code to 
-    ### generate list of illegal characters to be replaced
-    
-    print('**********Step 1b: Use raw csv files and ipa.xml from Phon source code to generate illegal_chars**********')
-    
-    raw_csv_dir = os.path.join(xls_dir,r'raw_csv')
+    ### Use raw csv files and ipa.xml from Phon source code to 
+    ### generate list of illegal characters to be replaced    
+    raw_csv_dir = 'rawCSV'
     # Raw csv directory path
     try:
         raw_csv_dir
     except NameError:
         raw_csv_dir = os.path.normpath(input('Enter raw csv directory path: '))
-    with change_dir(os.path.normpath(raw_csv_dir)):   
+    with change_dir(raw_csv_dir):   
         # Create list of csv files in subdirectories
         csv_files = [os.path.join(root, filename)
-                    for root, dirs, files in os.walk(raw_csv_dir)
+                    for root, dirs, files in os.walk(os.getcwd())
                     for filename in files
                     if filename.endswith((".csv"))]
         # Loop through files in directory
@@ -154,7 +113,7 @@ def illegalChars():
         else:
             print(char, end=' ')
             illegal_chars.append(char)
-            df_illegal_chars = pd.DataFrame(illegal_chars)
+            df_illegal_chars = pd.DataFrame(illegal_chars, columns = ['Illegal Characters'])
                 ## Save CSV of replacement tracker
                 # Change to new subdirectory
     with change_dir(cwd):                                 
@@ -163,9 +122,11 @@ def illegalChars():
             os.makedirs('info')
             print('Created:', os.path.join(os.getcwd(),'info'))
         except WindowsError:
-            print('\ninfo/{} directory already created.'.format(name))
+            print('\ninfo/ directory already created.')
         # Change to new subdirectory
         with change_dir(os.path.join(cwd, 'info')):                                            
-                df_illegal_chars.to_csv('illegal_chars.csv', encoding = 'utf-8')       
+                df_illegal_chars.to_csv('illegal_chars.csv', encoding = 'utf-8', index = False)       
     print('illegal_chars list created')
     return
+
+illegalChars()
