@@ -7,3 +7,4 @@
 /draft files/*
 /raw_csv/*
 /rawCSV/*
+/__pycache__/*

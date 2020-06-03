@@ -37,7 +37,7 @@ import pandas as pd
 # May also require xlrd install as dependency for pandas
 import numpy as np
 import os
-import unicodecsv as csv
+import csv
 import sys
 import re
 from collections import Counter
@@ -91,14 +91,14 @@ word_list = []
 
 # Create dictionary other_chars_dict from csv
 other_chars_path = os.path.join(cwd,r"dicts\other_chars_translate_dict.csv")
-reader1 = csv.DictReader(open(other_chars_path)) 
+reader1 = csv.DictReader(open(other_chars_path, encoding = 'utf-8')) 
 for row in reader1:
     other_chars_dict = OrderedDict(row)
 
 # Create ordered dictionary superscript_dict_initial from csv
 superscript_dict_initial_path = os.path.join(cwd,r"dicts\superscript_dict_initial.csv")
 dummylist = []
-with open(superscript_dict_initial_path, 'r') as f:
+with open(superscript_dict_initial_path, 'r', encoding = 'utf-8') as f:
     reader = csv.reader(f)
     headers = next(reader)
     for row in reader:
@@ -108,7 +108,7 @@ superscript_dict_initial = dummylist[0]
 # Create ordered dictionary superscript_dict_initial2 from csv
 superscript_dict_initial_path2 = os.path.join(cwd,r"dicts\superscript_dict_initial_2.csv")
 dummylist = []
-with open(superscript_dict_initial_path2, 'r') as f:
+with open(superscript_dict_initial_path2, 'r', encoding = 'utf-8') as f:
     reader = csv.reader(f)
     headers = next(reader)
     for row in reader:
@@ -118,7 +118,7 @@ superscript_dict_initial2 = dummylist[0]
 # Create ordered dictionary superscript_dict_initial3 from csv
 superscript_dict_initial_path3 = os.path.join(cwd,r"dicts\superscript_dict_initial_3.csv")
 dummylist = []
-with open(superscript_dict_initial_path3, 'r') as f:
+with open(superscript_dict_initial_path3, 'r', encoding = 'utf-8') as f:
     reader = csv.reader(f)
     headers = next(reader)
     for row in reader:
@@ -128,7 +128,7 @@ superscript_dict_initial3 = dummylist[0]
 # Create dictionary superscript_dict_noninitial from csv
 superscript_dict_noninitial_path = os.path.join(cwd,r"dicts\superscript_dict_noninitial.csv")  
 dummylist = []
-with open(superscript_dict_noninitial_path, 'r') as f:
+with open(superscript_dict_noninitial_path, 'r', encoding = 'utf-8') as f:
     reader = csv.reader(f)
     headers = next(reader)
     for row in reader:
@@ -137,19 +137,19 @@ superscript_dict_noninitial = dummylist[0]
 
 # Create dictionary notes_dict from csv
 notes_dict_path = os.path.join(cwd,r"dicts\notes_dict.csv")
-reader3 = csv.DictReader(open(notes_dict_path)) 
+reader3 = csv.DictReader(open(notes_dict_path, encoding = 'utf-8')) 
 for row in reader3:
     notes_dict = dict(row)
     
 # Create word index for df
 word_dict_path = os.path.join(cwd,r"dicts\word_dict.csv")
-reader4 = csv.reader(open(word_dict_path)) 
+reader4 = csv.reader(open(word_dict_path, encoding = 'utf-8')) 
 for row in reader4:
     word_dict = list(row)
     
 # Create dictionary target_dict from csv
 target_dict_path = os.path.join(cwd,r"dicts\target_dict.csv")
-reader5 = csv.DictReader(open(target_dict_path)) 
+reader5 = csv.DictReader(open(target_dict_path, encoding = 'utf-8')) 
 for row in reader5:
     target_dict = dict(row)
 
@@ -231,7 +231,7 @@ with change_dir(os.path.normpath(xls_dir)):
                     print(name, "Copyright sheet excluded")
                 if sheet == 'Probe Schedule':
                     print(name, "Probe Schedule sheet excluded")
-                    ### TODO get index of notes
+                    ### TODO get index of notes: accomplished with auxiliary.py
                 else:                
                     for col in df_sheet.columns:
                         if col == 'Target':
@@ -257,7 +257,7 @@ with change_dir(os.path.normpath(xls_dir)):
                                 print('************************************')
                                 print(u'{} instances of {} removed'.format(cur_rep_count, u'̹'))
                                                                                                                                                                
-                            # Replace 'ɑ' with blank
+                            # Replace 'ɑ' with 'a'
                             # cur_rep_count to track instances of replacements. In unicode
                             cur_rep_count = df_sheet[col].str.count(u'ɑ', re.UNICODE).sum()
                             sheet_rep_dict[u'ɑ Ortho'+u'_to_'+u'a'] += cur_rep_count                            
@@ -290,7 +290,7 @@ with change_dir(os.path.normpath(xls_dir)):
                             # Replace 'thiers' with 'theirs'
                             # cur_rep_count to track instances of replacements. In unicode
                             cur_rep_count = df_sheet[col].str.count(r'^thiers$', re.UNICODE).sum()
-                            sheet_rep_dict[ur'^thiers$'+u'_to_'+u'theirs'] += cur_rep_count                            
+                            sheet_rep_dict[r'^thiers$'+u'_to_'+u'theirs'] += cur_rep_count                            
                             # replace all instances
                             df_sheet[col] = df_sheet[col].str.replace(r'^thiers$', u'theirs', re.UNICODE)
                             if cur_rep_count > 0:
@@ -300,7 +300,7 @@ with change_dir(os.path.normpath(xls_dir)):
                             # Replace 'moustach' with 'moustache'
                             # cur_rep_count to track instances of replacements. In unicode
                             cur_rep_count = df_sheet[col].str.count(r'^moustach$', re.UNICODE).sum()
-                            sheet_rep_dict[ur'^moustach$'+u'_to_'+u'moustache'] += cur_rep_count                            
+                            sheet_rep_dict[r'^moustach$'+u'_to_'+u'moustache'] += cur_rep_count                            
                             # replace all instances
                             df_sheet[col] = df_sheet[col].str.replace(r'^moustach$', u'moustache', re.UNICODE)
                             if cur_rep_count > 0:
@@ -310,7 +310,7 @@ with change_dir(os.path.normpath(xls_dir)):
                             # Replace 'loag' with 'loaf'
                             # cur_rep_count to track instances of replacements. In unicode
                             cur_rep_count = df_sheet[col].str.count(r'^loag$', re.UNICODE).sum()
-                            sheet_rep_dict[ur'^loag$'+u'_to_'+u'loaf'] += cur_rep_count                            
+                            sheet_rep_dict[r'^loag$'+u'_to_'+u'loaf'] += cur_rep_count                            
                             # replace all instances
                             df_sheet[col] = df_sheet[col].str.replace(r'^loag$', u'loaf', re.UNICODE)
                             if cur_rep_count > 0:
@@ -324,13 +324,13 @@ with change_dir(os.path.normpath(xls_dir)):
                             ## Working with current probe administration column
                             
                             # Populate DI column (delayed/direct imitation) locating [] in cells.
-                            df_sheet['DI'] = np.where(df_sheet[col].str.contains(u'[]', regex=False).fillna(False), 1, '')
+                            df_sheet['DI'] = np.where(df_sheet[col].str.contains(u'\[\]|□', re.UNICODE, regex=True).fillna(False), 1, '')
                             
                             # Number of Productions Tier
                             df_sheet['NumProductions'] = np.where(df_sheet[col].str.contains('    [^\s](?! *\])', regex=True).fillna(False), 1.0+df_sheet[col].str.count('    [^\s](?! *\])', re.UNICODE), '')                       
                         
                             # NR "denotes 'no response'" - new column entry (Notes
-                            df_sheet['Notes'] = np.where(df_sheet[col].str.contains(ur'NR|ɴʀ', re.UNICODE, regex=True).fillna(False), 'No Response', "") 
+                            df_sheet['Notes'] = np.where(df_sheet[col].str.contains(r'NR|ɴʀ', re.UNICODE, regex=True).fillna(False), 'No Response', "") 
                             
                             # Add participant number to metadata, participant tier, and name of file
                             df_sheet['Speaker'] = name
@@ -366,20 +366,11 @@ with change_dir(os.path.normpath(xls_dir)):
                             
                             ## Replacements applying to all data go here:
                             
-                            # Remove errored cell: [v aɪ j oʊ  'fire'] 5696PKP.csv, Line 35: column 6                         
-                            # cur_rep_count to track instances of replacements. In unicode
-                            cur_rep_count = df_sheet[col].str.count(ur"v aɪ j oʊ  'fire'", re.UNICODE).sum()
-                            sheet_rep_dict[ur"v aɪ j oʊ  'fire'_removed"] += cur_rep_count             
-                            # replace all instances
-                            df_sheet[col] = df_sheet[col].str.replace(ur"v aɪ j oʊ  'fire'", '', re.UNICODE)
-                            if cur_rep_count > 0:
-                                print('************************************')
-                                print(u'{} instances of {} removed'.format(cur_rep_count, ur"v aɪ j oʊ  'fire'"))                            
-                            
-                            # Replace [] with blank
+                            # Replace [] and □ with blank
                             # cur_rep_count to track instances of replacements. In unicode
                             cur_rep_count = df_sheet[col].str.count('\[\]', re.UNICODE).sum()
-                            sheet_rep_dict[u'\[\]'+u'_to_'+u''] += cur_rep_count                            
+                            cur_rep_count += df_sheet[col].str.count('□', re.UNICODE).sum()
+                            sheet_rep_dict[u'\[\] or □'+u'_to_'+u''] += cur_rep_count                            
                             # replace all instances of space ' {1,2}(?! )' with blank.
                             df_sheet[col] = df_sheet[col].str.replace('\[\]', '', re.UNICODE)
                             if cur_rep_count > 0:
@@ -388,7 +379,7 @@ with change_dir(os.path.normpath(xls_dir)):
                             
                             # replace other translated segments other_chars_translate_dict.csv
                             # Also addresses " line parsing error with extra return in cell. Possible solution: remove /n before creating csv
-                            # Also addresses removal of [] and whitespaces
+                            # Also addresses removal of [] and some whitespaces
                             for key in other_chars_dict:
                                 # cur_rep_count to track instances of replacements. In unicode
                                 cur_rep_count = df_sheet[col].str.count(six.text_type(key), re.UNICODE).sum()
@@ -564,72 +555,3 @@ with change_dir(os.path.normpath(xls_dir)):
     print('word_list.csv created')    
 
 
-### Unfinished code below: check for illegal characters. 
-### Currently accomplished with Phon CheckTranscript
-    
-    """                
-    ### Look for illegal_chars 
-    # Create empty DataFrame for illegal_char_count dictaries for each participant
-    df_illegal_chars_count = pd.DataFrame() 
-    
-    result_dir = r'C:\Users\Philip\Desktop\test Excel\csv'
-    # Result directory path
-    try:
-        result_dir
-    except NameError:
-        result_dir = os.path.normpath(raw_input('Enter result csv directory path: '))
-    with change_dir(os.path.normpath(result_dir)):   
-        # Create list of csv files in subdirectories
-        csv_files = [os.path.join(root2, filename2)
-                    for root2, dirs2, files2 in os.walk(result_dir)
-                    for filename2 in files2
-                    if filename2.endswith((".csv"))]
-        # Loop through files in directory
-        for cur_csv in csv_files:
-            
-            # Create illegal_chars_counter
-            illegal_chars_count = Counter()
-            
-            # open CSV file in read mode with UTF-8 encoding
-            with io.open(cur_csv, mode='r', encoding='utf-8') as current_csv:
-                # Create string variable from CSV
-                csv_str = current_csv.read()
-                
-                try:
-                    illegal_chars
-                except NameError:
-                    with open(raw_input('Input location of illegal_chars.csv: '), 'rb') as f:
-                        reader = csv.reader(f)
-                        illegal_chars = list(reader)
-                for char in illegal_chars:
-                    if csv_str.count(char) == 0:
-                        pass
-                    if csv_str.count(char) > 0:
-                        if char == u',':
-                            continue
-                        if char == u';':
-                            continue
-                        else:
-                            print u'ERROR: illegal character {} found in {}'.format(char, cur_csv)                        
-                            illegal_chars_count[char] += csv_str.count(char)
-            df_illegal_chars_count[cur_csv] = illegal_chars_count
-    
-    # Create illegal characters count csv
-    with change_dir(os.path.join(xls_dir)):                                 
-        # Create new subdirectory to place csv file
-        try:
-            os.makedirs('info')
-            print 'Created:', os.path.join(os.getcwd(),'info')
-        except WindowsError:
-            print 'info/{} directory already created.'.format(name)
-        # Change to new subdirectory
-        with change_dir(os.path.join(xls_dir, 'info')):                                            
-                df_replace_counts.to_csv('illegal_chars_count.csv', encoding = 'utf-8')
-    print 'illegal_chars.csv created'    
-    """
-
-    """
-    # For debug purposes, delete folder of csv files that was just created
-    shutil.rmtree(r'C:\Users\Philip\Desktop\test Excel\csv')
-    print r'C:\Users\Philip\Desktop\test Excel\csv folder deleted'
-    """

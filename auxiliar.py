@@ -40,6 +40,10 @@ def change_dir(newdir):
         os.chdir(prevdir)
 
 
+excludeList = ['(clock)', '(eat it)', '(incomplete transcription)', '(pole)', 
+            '(pulling)', '(sweatshirt)', '(that one)', '(that)', '(thunder)',
+            'ziggy', 'pitch', 'quɑrter', 'nose', "'fire'"]
+
 def accessExcelDict(xlsDirName):
     
     """
@@ -274,7 +278,7 @@ def extractSegments(segmentType):
     assert segmentType in ['phones', 'compounds', 'characters'], """
     segmentType must be specified as:
         'phones' for all unitary and multi-component phones with diacritics
-        'compounds' for compound phones only
+        'compounds' for base compound phones only
         'characters' for all characters"""
         
     xlsDict = accessExcelDict('excel')
@@ -293,6 +297,10 @@ def extractSegments(segmentType):
                         continue
                     if col == 'Word':
                         continue
+                    # Remove items from excludeList
+                    for item in excludeList:
+                        dfSheet[col] = dfSheet[col].str.replace(
+                                item, '', re.UNICODE)                   
                     else:
                         if segmentType == 'phones':
                             dfSheetIPA = dfSheet[col].str.findall(
@@ -312,7 +320,10 @@ def extractSegments(segmentType):
                             for i in item:
                                 result.add(i)
         print(f'{xls} searched')
-        
+    
+    # Sort list by length
+    result = sorted(list(result), key=len)
+    
     # Save result to csv in 'info' directory
     try:
         os.makedirs('info')
@@ -321,10 +332,10 @@ def extractSegments(segmentType):
         pass
     with open(os.path.join('info',f'{segmentType}.csv'), 'wb') as csvOutput:
         writer = csv.writer(csvOutput, encoding = 'utf-8')
-        for e in list(set(result)):
+        for e in result:
             writer.writerow([e])
     print(f"'{segmentType}.csv' created in 'info' directory.")
-    return list(result)
+    return result
 
 
 # ToDo: 
