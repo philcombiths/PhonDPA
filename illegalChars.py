@@ -57,11 +57,18 @@ def illegalChars(csvType):
     illegal_chars = []
     
     ### Create raw csv files if not in directory
-    if os.path.isdir('rawCSV'):
-        print("'rawCSV' folder already created.")
-    else:
-        genRawCSV()
-        
+
+    if csvType == 'raw':
+        if os.path.isdir('rawCSV'):    
+            print("'rawCSV' folder found.")
+        else:
+            genRawCSV()
+    if csvType == 'processed':
+        if os.path.isdir('csv'):
+            print("'csv' folder found.")
+        else:
+            sys.exit("No 'csv' folder found. First run dpa_script.py to generate processed csv files.")
+
     # Preset xls_dir
     xls_dir = os.path.join(cwd,r'excel')
     

@@ -43,7 +43,6 @@ import re
 from collections import Counter
 from collections import OrderedDict
 from contextlib import contextmanager
-from illegalChars import illegalChars
 import six
 from six.moves import zip
 from six.moves import input
@@ -68,20 +67,12 @@ def change_dir(newdir):
 #### if "other_chars_translate_dict.csv", "superscript_dict_initial.csv", 
 #### and "superscript_dict_noninitial.csv" already exist in "dicts" directory.
 
-print('**********Step 1: Get list of illegal characters**********')
-def illegalCharsCheck():
-    if os.path.isfile(os.path.join(cwd,r'dicts\other_chars_translate_dict.csv')):
-        if os.path.isfile(os.path.join(cwd,r'dicts\superscript_dict_initial.csv')):
-            if os.path.isfile(os.path.join(cwd,r'dicts\superscript_dict_noninitial.csv')):
-                print(r'other_chars_translate_dict.csv, superscript_dict_initial.csv, and superscript_dict_noninitial.csv found in directory dicts')
-                print(r'Skipped illegal characters list generation and proceeding to Excel edits using these dictionaries')
-                return False
-    input('required dictionary csv files not found. Generate illegal characters? (Y/N):')
-    if raw_input == "Y" or raw_input == "y":
-        return True
-
-if illegalCharsCheck():
-    illegalChars()
+print('**********Step 1: Check for translation dictionaries**********')
+assert os.path.isfile(os.path.join(cwd,r'dicts\other_chars_translate_dict.csv')), 'superscript_dict_noninitial.csv not found. Exiting script.'
+assert os.path.isfile(os.path.join(cwd,r'dicts\superscript_dict_initial.csv')), 'superscript_dict_initial.csv.csv not found. Exiting script.'
+assert os.path.isfile(os.path.join(cwd,r'dicts\superscript_dict_noninitial.csv')), 'other_chars_translate_dict.csv not found. Exiting script.'
+print(r'other_chars_translate_dict.csv, superscript_dict_initial.csv, and superscript_dict_noninitial.csv found in directory dicts')
+print(r'Proceeding to Excel edits using these dictionaries')
    
 #### Step 2: Work with Excel files as DataFrames
 print('**********Step 2: Work with Excel files as DataFrames**********')
