@@ -39,8 +39,9 @@ def change_dir(newdir):
     finally:
         os.chdir(prevdir)
 
+"(incomplete transcription)"
 
-excludeList = ['(clock)', '(eat it)', '(incomplete transcription)', '(pole)', 
+excludeList = ['(clock)', '(eat it)', '(pole)', 
             '(pulling)', '(sweatshirt)', '(that one)', '(that)', '(thunder)',
             'ziggy', 'pitch', 'quɑrter', 'nose', "'fire'"]
 
@@ -338,5 +339,10 @@ def extractSegments(segmentType):
     return result
 
 
-# ToDo: 
-# identify location of unique segment combinations                  
+# Testing 
+df = pd.DataFrame({'Word' : ['Alpha', 'Beta', 'Comma', 'Delta'], 
+                   'Transcription' : ['ælfə', 'beɪɾə', 'kɑmə', "faɪjəɹ   'fire'"]})
+    
+newDF = df[df['Transcription'].str.contains('fire')]
+
+df.loc[newDF.index, 'Word'] = 'fire'

@@ -9,3 +9,4 @@
 /rawCSV/*
 /__pycache__/*
 /files/*
+/csv*/*

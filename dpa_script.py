@@ -46,7 +46,7 @@ from contextlib import contextmanager
 import six
 from six.moves import zip
 from six.moves import input
-
+from auxiliar import excludeList
 
 # Set default directory to location of script
 os.chdir(os.path.dirname(sys.argv[0]))
@@ -223,7 +223,8 @@ with change_dir(os.path.normpath(xls_dir)):
                 if sheet == 'Probe Schedule':
                     print(name, "Probe Schedule sheet excluded")
                     ### TODO get index of notes: accomplished with auxiliary.py
-                else:                
+                else:                                   
+                    # Iterate through DataFrame columns
                     for col in df_sheet.columns:
                         if col == 'Target':
                             print('Target skipped')
@@ -354,7 +355,28 @@ with change_dir(os.path.normpath(xls_dir)):
                             
                             # Populate Notes Tier... other stuff?                
                             
-                            
+                            # Replace items from excludeList
+                            excludedList = []
+                            for item in excludeList:
+                                
+                                ### CHANGE SO THIS EDITS THE ORTHOGRAPHY TIER INSTEAD???
+                                if len(df_sheet[df_sheet[col].astype(str).str.contains(item)]) == 1:
+                                    excludedList.append(item)
+                                    # Get row index of item
+                                    rowIndex = df_sheet[df_sheet[col].astype(str).str.contains(item)].index
+                                    # remove item from cell
+                                    df_sheet[col] = df_sheet[col].str.replace(item, '', re.UNICODE)
+                                    replaceList = ["'", "(", ")"]
+                                    # remove symbols around word
+                                    for c in replaceList:
+                                        item = item.replace(c, '')
+                                    # replace item in word column
+                                    df_sheet.loc[rowIndex, 'Word'] = item
+                                   # Add Note
+                                    df_sheet.loc[rowIndex, 'Notes'] = f"Probe target '{rowIndex[0]}' but child produced '{item}'"                                    
+                                    # also replace item in index column
+                                    df_sheet.rename(index={rowIndex[0]:item},inplace=True)
+                                    
                             ## Replacements applying to all data go here:
                             
                             # Replace [] and □ with blank
@@ -379,8 +401,11 @@ with change_dir(os.path.normpath(xls_dir)):
                                 df_sheet[col] = df_sheet[col].str.replace(six.text_type(key), six.text_type(other_chars_dict[key]), re.UNICODE)
                                 if cur_rep_count > 0:
                                     print('************************************')
-                                    print(u'{} instances of {} replaced with {}'.format(cur_rep_count, key, other_chars_dict[key]))                      
-                                                                    
+                                    print(u'{} instances of {} replaced with {}'.format(cur_rep_count, key, other_chars_dict[key]))    
+
+                            # Address combo segments
+                            
+                            
                             # Replace whitespaces, but leave space between multiple productions
                             # Mask excluding cells with multiple productions (these white spaces should remain)
                             mask = df_sheet.filter(['Word',col,'NumProductions'], axis=1).NumProductions == ''                           
@@ -545,4 +570,7 @@ with change_dir(os.path.normpath(xls_dir)):
                             encoding = 'utf-8', index = False)
     print('word_list.csv created')    
 
+
+# ToDo
+    # Add ligature to compound phones.
 
