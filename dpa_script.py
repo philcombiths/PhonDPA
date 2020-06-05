@@ -314,82 +314,87 @@ with change_dir(os.path.normpath(xls_dir)):
                            
                         else:                                               
                             ## Working with current probe administration column
+                            
                             ## Copy and work from copy of dataframe
                             dfTrans = df_sheet[['Word', 'Target', col, ]]
+                            dfTrans.set_index('Word', drop=False, inplace=True)
                             
                             # Populate DI column (delayed/direct imitation) locating [] in cells.
-                            df_sheet['DI'] = np.where(df_sheet[col].str.contains(u'\[\]|□', re.UNICODE, regex=True).fillna(False), 1, '')
+                            dfTrans['DI'] = np.where(dfTrans[col].str.contains(u'\[\]|□', re.UNICODE, regex=True).fillna(False), 1, '')
                             
                             # Number of Productions Tier
-                            df_sheet['NumProductions'] = np.where(df_sheet[col].str.contains('    [^\s](?! *\])', regex=True).fillna(False), 1.0+df_sheet[col].str.count('    [^\s](?! *\])', re.UNICODE), '')                       
+                            dfTrans['NumProductions'] = np.where(dfTrans[col].str.contains('    [^\s](?! *\])', regex=True).fillna(False), 1.0+dfTrans[col].str.count('    [^\s](?! *\])', re.UNICODE), '')                       
                         
                             # NR "denotes 'no response'" - new column entry (Notes
-                            df_sheet['Notes'] = np.where(df_sheet[col].str.contains(r'NR|ɴʀ', re.UNICODE, regex=True).fillna(False), 'No Response', "") 
+                            dfTrans['Notes'] = np.where(dfTrans[col].str.contains(r'NR|ɴʀ', re.UNICODE, regex=True).fillna(False), 'No Response', "") 
                             
                             # Add participant number to metadata, participant tier, and name of file
-                            df_sheet['Speaker'] = name
+                            dfTrans['Speaker'] = name
                             
                             # Add Probe to new tier and to name of file
-                            df_sheet['Probe'] = sheet
+                            dfTrans['Probe'] = sheet
                             
                             # Add Session to new tier and to name of file
-                            df_sheet['Session'] = col
+                            dfTrans['Session'] = col
                             
                             # Add CA from CA_Dict to new tier and to session metadata 
                             try:
-                                df_sheet['CA'] = CA_dict[col]
+                                dfTrans['CA'] = CA_dict[col]
                             # Condition A and Condition B are not specified in column heading. Workaround follows:
                             except KeyError:
                                 if ' A ' in sheet:
                                     try:
-                                        df_sheet['CA'] = CA_dict['Cond A ' + col]
+                                        dfTrans['CA'] = CA_dict['Cond A ' + col]
                                     except KeyError:
-                                        df_sheet['CA'] = CA_dict['Ver A ' + col]
+                                        dfTrans['CA'] = CA_dict['Ver A ' + col]
                                 if ' B ' in sheet:
                                     try:
-                                        df_sheet['CA'] = CA_dict['Cond B ' + col]
+                                        dfTrans['CA'] = CA_dict['Cond B ' + col]
                                     except KeyError:
-                                        df_sheet['CA'] = CA_dict['Ver B ' + col]                                                                                                                                                                                                                               
-                            
-                            # Populate IPA Target Tier with target_dict.csv
-                            df_sheet = df_sheet.set_index('Word', drop=False)
-                            df_sheet['IPA Target'] = pd.Series(target_dict, name='IPA Target')
-                            
-                            # Populate Notes Tier... other stuff?                
-                            
+                                        dfTrans['CA'] = CA_dict['Ver B ' + col]                                                                                                                                                                                                                               
+
+
                             # Replace items from excludeList
                             excludedList = []
                             for item in excludeList:
                                 
-                                ### CURRENTLY ONLY WORKS IF THERE IS ONLY ONE OCCURRENCE PER PARTICIPANT.
-                                ## Does not work for "that" or "that one"
-                                ## Also leaves "'" and "(" in the excel?
-                                if len(df_sheet[df_sheet[col].astype(str).str.contains(item)]) == 1:
+                                ## Also must change the IPA Target
+                                
+                                if len(dfTrans[dfTrans[col].astype(str).str.contains(item)]) == 1:
                                     excludedList.append(item)
                                     # Get row index of item
-                                    rowIndex = df_sheet[df_sheet[col].astype(str).str.contains(item)].index
+                                    rowIndex = dfTrans[dfTrans[col].astype(str).str.contains(item)].index
                                     # remove item from cell
-                                    df_sheet[col] = df_sheet[col].str.replace(item, '', re.UNICODE)
+                                    dfTrans[col] = dfTrans[col].str.replace(item, '', regex=False)
                                     replaceList = ["'", "(", ")"]
                                     # remove symbols around word
                                     for c in replaceList:
                                         item = item.replace(c, '')
                                     # replace item in word column
-                                    df_sheet.loc[rowIndex, 'Word'] = item
+                                    dfTrans.loc[rowIndex, 'Word'] = item
                                    # Add Note
-                                    df_sheet.loc[rowIndex, 'Notes'] = f"Probe target '{rowIndex[0]}' but child produced '{item}'"                                    
+                                    dfTrans.loc[rowIndex, 'Notes'] = f"Probe target '{rowIndex[0]}' but child produced '{item}'"                                    
                                     # also replace item in index column
-                                    df_sheet.rename(index={rowIndex[0]:item},inplace=True)
+                                    dfTrans.rename(index={rowIndex[0]:item},inplace=True)
+
+                            
+                            # Populate IPA Target Tier with target_dict.csv
+                            dfTrans = dfTrans.set_index('Word', drop=False)
+                            dfTrans['IPA Target'] = pd.Series(target_dict, name='IPA Target')
+                            
+                            # Populate Notes Tier... other stuff?                
+                            
+
                                     
                             ## Replacements applying to all data go here:
                             
                             # Replace [] and □ with blank
                             # cur_rep_count to track instances of replacements. In unicode
-                            cur_rep_count = df_sheet[col].str.count('\[\]', re.UNICODE).sum()
-                            cur_rep_count += df_sheet[col].str.count('□', re.UNICODE).sum()
+                            cur_rep_count = dfTrans[col].str.count('\[\]', re.UNICODE).sum()
+                            cur_rep_count += dfTrans[col].str.count('□', re.UNICODE).sum()
                             sheet_rep_dict[u'\[\] or □'+u'_to_'+u''] += cur_rep_count                            
                             # replace all instances of space ' {1,2}(?! )' with blank.
-                            df_sheet[col] = df_sheet[col].str.replace('\[\]', '', re.UNICODE)
+                            dfTrans[col] = dfTrans[col].str.replace('\[\]', '', re.UNICODE)
                             if cur_rep_count > 0:
                                 print('************************************')
                                 print(u'{} instances of {} removed'.format(cur_rep_count, '[]'))     
@@ -399,10 +404,10 @@ with change_dir(os.path.normpath(xls_dir)):
                             # Also addresses removal of [] and some whitespaces
                             for key in other_chars_dict:
                                 # cur_rep_count to track instances of replacements. In unicode
-                                cur_rep_count = df_sheet[col].str.count(six.text_type(key), re.UNICODE).sum()
+                                cur_rep_count = dfTrans[col].str.count(six.text_type(key), re.UNICODE).sum()
                                 sheet_rep_dict[key+u'_to_'+ other_chars_dict[key]] += cur_rep_count             
                                 # replace all instances of dictionary key with corresponding value. In unicode
-                                df_sheet[col] = df_sheet[col].str.replace(six.text_type(key), six.text_type(other_chars_dict[key]), re.UNICODE)
+                                dfTrans[col] = dfTrans[col].str.replace(six.text_type(key), six.text_type(other_chars_dict[key]), re.UNICODE)
                                 if cur_rep_count > 0:
                                     print('************************************')
                                     print(u'{} instances of {} replaced with {}'.format(cur_rep_count, key, other_chars_dict[key]))    
@@ -412,23 +417,23 @@ with change_dir(os.path.normpath(xls_dir)):
                             
                             # Replace whitespaces, but leave space between multiple productions
                             # Mask excluding cells with multiple productions (these white spaces should remain)
-                            mask = df_sheet.filter(['Word',col,'NumProductions'], axis=1).NumProductions == ''                           
+                            mask = dfTrans.filter(['Word',col,'NumProductions'], axis=1).NumProductions == ''                           
                             # cur_rep_count to track instances of replacements. In unicode
-                            cur_rep_count = df_sheet.loc[mask, col].str.count(' ', re.UNICODE).sum()
+                            cur_rep_count = dfTrans.loc[mask, col].str.count(' ', re.UNICODE).sum()
                             sheet_rep_dict[u' '+u'_to_'+u''] += cur_rep_count                            
                             # replace all instances of space ' ' with blank.
-                            df_sheet.loc[mask, col] = df_sheet.loc[mask, col].str.replace(' ', '', re.UNICODE) 
+                            dfTrans.loc[mask, col] = dfTrans.loc[mask, col].str.replace(' ', '', re.UNICODE) 
                             if cur_rep_count > 0:
                                 print('************************************')
                                 print(u'{} instances of {} removed'.format(cur_rep_count, 'whitespace'))
                                                                                                               
                             # Replace single whitespaces in instances with multiple productions
-                            mask = df_sheet.filter(['Word',col,'NumProductions'], axis=1).NumProductions != ''
+                            mask = dfTrans.filter(['Word',col,'NumProductions'], axis=1).NumProductions != ''
                             # cur_rep_count to track instances of replacements. In unicode
-                            cur_rep_count = df_sheet.loc[mask, col].str.count(' {1,3}(?! )', re.UNICODE).sum()
+                            cur_rep_count = dfTrans.loc[mask, col].str.count(' {1,3}(?! )', re.UNICODE).sum()
                             sheet_rep_dict[u' {1,3}(?! )'+u'_to_'+u''] += cur_rep_count                            
                             # replace all instances of space ' {1,2}(?! )' with blank.
-                            df_sheet.loc[mask, col] = df_sheet.loc[mask, col].str.replace(' {1,3}(?! )', '', re.UNICODE)                             
+                            dfTrans.loc[mask, col] = dfTrans.loc[mask, col].str.replace(' {1,3}(?! )', '', re.UNICODE)                             
                             if cur_rep_count > 0:
                                 print('************************************')
                                 print(u'{} instances of {} removed from records with multiple utterances'.format(cur_rep_count, 'whitespace'))                          
@@ -436,10 +441,10 @@ with change_dir(os.path.normpath(xls_dir)):
                             # replace superscripts superscript_dict_initial.csv                
                             for key in superscript_dict_initial:
                                 # cur_rep_count to track instances of replacements. In unicode
-                                cur_rep_count = df_sheet[col].str.count(six.text_type(key), re.UNICODE).sum()
+                                cur_rep_count = dfTrans[col].str.count(six.text_type(key), re.UNICODE).sum()
                                 sheet_rep_dict[key+u'_to_'+ superscript_dict_initial[key]] += cur_rep_count             
                                 # replace all instances of dictionary key with corresponding value. In unicode
-                                df_sheet[col] = df_sheet[col].str.replace(six.text_type(key), six.text_type(superscript_dict_initial[key]), re.UNICODE)                               
+                                dfTrans[col] = dfTrans[col].str.replace(six.text_type(key), six.text_type(superscript_dict_initial[key]), re.UNICODE)                               
                                 if cur_rep_count > 0:
                                     print('************************************')
                                     print(u'{} instances of {} (initial) replaced with {}'.format(cur_rep_count, key, superscript_dict_initial[key]))
@@ -447,10 +452,10 @@ with change_dir(os.path.normpath(xls_dir)):
                             # replace superscripts superscript_dict_initial_2.csv                
                             for key in superscript_dict_initial2:
                                 # cur_rep_count to track instances of replacements. In unicode
-                                cur_rep_count = df_sheet[col].str.count(six.text_type(key), re.UNICODE).sum()
+                                cur_rep_count = dfTrans[col].str.count(six.text_type(key), re.UNICODE).sum()
                                 sheet_rep_dict[key+u'_to_'+ superscript_dict_initial2[key]] += cur_rep_count             
                                 # replace all instances of dictionary key with corresponding value. In unicode
-                                df_sheet[col] = df_sheet[col].str.replace(six.text_type(key), six.text_type(superscript_dict_initial2[key]), re.UNICODE)                               
+                                dfTrans[col] = dfTrans[col].str.replace(six.text_type(key), six.text_type(superscript_dict_initial2[key]), re.UNICODE)                               
                                 if cur_rep_count > 0:
                                     print('************************************')
                                     print(u'{} instances of {} (initial) replaced with {}'.format(cur_rep_count, key, superscript_dict_initial2[key]))
@@ -458,10 +463,10 @@ with change_dir(os.path.normpath(xls_dir)):
                             # replace superscripts superscript_dict_initial_3.csv                
                             for key in superscript_dict_initial3:
                                 # cur_rep_count to track instances of replacements. In unicode
-                                cur_rep_count = df_sheet[col].str.count(six.text_type(key), re.UNICODE).sum()
+                                cur_rep_count = dfTrans[col].str.count(six.text_type(key), re.UNICODE).sum()
                                 sheet_rep_dict[key+u'_to_'+ superscript_dict_initial3[key]] += cur_rep_count             
                                 # replace all instances of dictionary key with corresponding value. In unicode
-                                df_sheet[col] = df_sheet[col].str.replace(six.text_type(key), six.text_type(superscript_dict_initial3[key]), re.UNICODE)                               
+                                dfTrans[col] = dfTrans[col].str.replace(six.text_type(key), six.text_type(superscript_dict_initial3[key]), re.UNICODE)                               
                                 if cur_rep_count > 0:
                                     print('************************************')
                                     print(u'{} instances of {} (initial) replaced with {}'.format(cur_rep_count, key, superscript_dict_initial3[key]))
@@ -469,10 +474,10 @@ with change_dir(os.path.normpath(xls_dir)):
                             # replace superscripts superscript_dict_noninitial.csv                
                             for key in superscript_dict_noninitial:
                                 # cur_rep_count to track instances of replacements. In unicode
-                                cur_rep_count = df_sheet[col].str.count(six.text_type(key), re.UNICODE).sum()
+                                cur_rep_count = dfTrans[col].str.count(six.text_type(key), re.UNICODE).sum()
                                 sheet_rep_dict[key+u'_to_'+ superscript_dict_noninitial[key]] += cur_rep_count             
                                 # replace all instances of dictionary key with corresponding value. In unicode
-                                df_sheet[col] = df_sheet[col].str.replace(six.text_type(key), six.text_type(superscript_dict_noninitial[key]), re.UNICODE)                               
+                                dfTrans[col] = dfTrans[col].str.replace(six.text_type(key), six.text_type(superscript_dict_noninitial[key]), re.UNICODE)                               
                                 if cur_rep_count > 0:
                                     print('************************************')
                                     print(u'{} instances of {} (noninitial) replaced with {}'.format(cur_rep_count, key, superscript_dict_noninitial[key]))
@@ -481,40 +486,40 @@ with change_dir(os.path.normpath(xls_dir)):
                             ########## Also, don't remove spaces in multiple words.
                                                         
                             # cur_rep_count to track instances of replacements. In unicode
-                            cur_rep_count = df_sheet['NumProductions'].str.count('2.0', re.UNICODE).sum()                            
+                            cur_rep_count = dfTrans['NumProductions'].str.count('2.0', re.UNICODE).sum()                            
                             sheet_rep_dict[u'ortho x 2'] += cur_rep_count
-                            cur_rep_count = df_sheet['NumProductions'].str.count('3.0', re.UNICODE).sum()                            
+                            cur_rep_count = dfTrans['NumProductions'].str.count('3.0', re.UNICODE).sum()                            
                             sheet_rep_dict[u'ortho x 3'] += cur_rep_count
-                            cur_rep_count = df_sheet['NumProductions'].str.count('4.0', re.UNICODE).sum()                            
+                            cur_rep_count = dfTrans['NumProductions'].str.count('4.0', re.UNICODE).sum()                            
                             sheet_rep_dict[u'ortho x 4'] += cur_rep_count                                
-                            cur_rep_count = df_sheet['NumProductions'].str.count('5.0', re.UNICODE).sum()                            
+                            cur_rep_count = dfTrans['NumProductions'].str.count('5.0', re.UNICODE).sum()                            
                             sheet_rep_dict[u'ortho x 5'] += cur_rep_count   
                                                                                     
                             # Multiply orthography instances by number of productions
                             
-                            df_sheet['Orthography'] = df_sheet['Word']
-                            mask = df_sheet.filter(['Orthography',col,'NumProductions'], axis=1).NumProductions == '2.0'                            
-                            df_sheet.loc[mask, 'Orthography'] = df_sheet.loc[mask, 'Orthography']+' '+df_sheet.loc[mask, 'Orthography']                            
-                            mask = df_sheet.filter(['Orthography',col,'NumProductions'], axis=1).NumProductions == '3.0'                            
-                            df_sheet.loc[mask, 'Orthography'] = df_sheet.loc[mask, 'Orthography']+' '+df_sheet.loc[mask, 'Orthography']+' '+df_sheet.loc[mask, 'Orthography']                             
-                            mask = df_sheet.filter(['Orthography',col,'NumProductions'], axis=1).NumProductions == '4.0'                            
-                            df_sheet.loc[mask, 'Orthography'] = df_sheet.loc[mask, 'Orthography']+' '+df_sheet.loc[mask, 'Orthography']+' '+df_sheet.loc[mask, 'Orthography']+' '+df_sheet.loc[mask, 'Orthography']
-                            mask = df_sheet.filter(['Orthography',col,'NumProductions'], axis=1).NumProductions == '5.0'                            
-                            df_sheet.loc[mask, 'Orthography'] = df_sheet.loc[mask, 'Orthography']+' '+df_sheet.loc[mask, 'Orthography']+' '+df_sheet.loc[mask, 'Orthography']+' '+df_sheet.loc[mask, 'Orthography']\
-                            +' \ '+df_sheet.loc[mask, 'Orthography']
+                            dfTrans['Orthography'] = dfTrans['Word']
+                            mask = dfTrans.filter(['Orthography',col,'NumProductions'], axis=1).NumProductions == '2.0'                            
+                            dfTrans.loc[mask, 'Orthography'] = dfTrans.loc[mask, 'Orthography']+' '+dfTrans.loc[mask, 'Orthography']                            
+                            mask = dfTrans.filter(['Orthography',col,'NumProductions'], axis=1).NumProductions == '3.0'                            
+                            dfTrans.loc[mask, 'Orthography'] = dfTrans.loc[mask, 'Orthography']+' '+dfTrans.loc[mask, 'Orthography']+' '+dfTrans.loc[mask, 'Orthography']                             
+                            mask = dfTrans.filter(['Orthography',col,'NumProductions'], axis=1).NumProductions == '4.0'                            
+                            dfTrans.loc[mask, 'Orthography'] = dfTrans.loc[mask, 'Orthography']+' '+dfTrans.loc[mask, 'Orthography']+' '+dfTrans.loc[mask, 'Orthography']+' '+dfTrans.loc[mask, 'Orthography']
+                            mask = dfTrans.filter(['Orthography',col,'NumProductions'], axis=1).NumProductions == '5.0'                            
+                            dfTrans.loc[mask, 'Orthography'] = dfTrans.loc[mask, 'Orthography']+' '+dfTrans.loc[mask, 'Orthography']+' '+dfTrans.loc[mask, 'Orthography']+' '+dfTrans.loc[mask, 'Orthography']\
+                            +' \ '+dfTrans.loc[mask, 'Orthography']
                             
                             # Multiply IPA Target instances by number of productions
                             
-                            df_sheet['IPA Target_dup'] = df_sheet['IPA Target']
-                            mask = df_sheet.filter(['IPA Target_dup',col,'NumProductions'], axis=1).NumProductions == '2.0'                            
-                            df_sheet.loc[mask, 'IPA Target_dup'] = df_sheet.loc[mask, 'IPA Target_dup']+' '+df_sheet.loc[mask, 'IPA Target_dup']                            
-                            mask = df_sheet.filter(['IPA Target_dup',col,'NumProductions'], axis=1).NumProductions == '3.0'                            
-                            df_sheet.loc[mask, 'IPA Target_dup'] = df_sheet.loc[mask, 'IPA Target_dup']+' '+df_sheet.loc[mask, 'IPA Target_dup']+' '+df_sheet.loc[mask, 'IPA Target_dup']                             
-                            mask = df_sheet.filter(['IPA Target_dup',col,'NumProductions'], axis=1).NumProductions == '4.0'                            
-                            df_sheet.loc[mask, 'IPA Target_dup'] = df_sheet.loc[mask, 'IPA Target_dup']+' '+df_sheet.loc[mask, 'IPA Target_dup']+' '+df_sheet.loc[mask, 'IPA Target_dup']+' '+df_sheet.loc[mask, 'IPA Target_dup']
-                            mask = df_sheet.filter(['IPA Target_dup',col,'NumProductions'], axis=1).NumProductions == '5.0'                            
-                            df_sheet.loc[mask, 'IPA Target_dup'] = df_sheet.loc[mask, 'IPA Target_dup']+' '+df_sheet.loc[mask, 'IPA Target_dup']+' '+df_sheet.loc[mask, 'IPA Target_dup']+' '+df_sheet.loc[mask, 'IPA Target_dup']\
-                            +' \ '+df_sheet.loc[mask, 'IPA Target_dup']                                                                                                                                             
+                            dfTrans['IPA Target_dup'] = dfTrans['IPA Target']
+                            mask = dfTrans.filter(['IPA Target_dup',col,'NumProductions'], axis=1).NumProductions == '2.0'                            
+                            dfTrans.loc[mask, 'IPA Target_dup'] = dfTrans.loc[mask, 'IPA Target_dup']+' '+dfTrans.loc[mask, 'IPA Target_dup']                            
+                            mask = dfTrans.filter(['IPA Target_dup',col,'NumProductions'], axis=1).NumProductions == '3.0'                            
+                            dfTrans.loc[mask, 'IPA Target_dup'] = dfTrans.loc[mask, 'IPA Target_dup']+' '+dfTrans.loc[mask, 'IPA Target_dup']+' '+dfTrans.loc[mask, 'IPA Target_dup']                             
+                            mask = dfTrans.filter(['IPA Target_dup',col,'NumProductions'], axis=1).NumProductions == '4.0'                            
+                            dfTrans.loc[mask, 'IPA Target_dup'] = dfTrans.loc[mask, 'IPA Target_dup']+' '+dfTrans.loc[mask, 'IPA Target_dup']+' '+dfTrans.loc[mask, 'IPA Target_dup']+' '+dfTrans.loc[mask, 'IPA Target_dup']
+                            mask = dfTrans.filter(['IPA Target_dup',col,'NumProductions'], axis=1).NumProductions == '5.0'                            
+                            dfTrans.loc[mask, 'IPA Target_dup'] = dfTrans.loc[mask, 'IPA Target_dup']+' '+dfTrans.loc[mask, 'IPA Target_dup']+' '+dfTrans.loc[mask, 'IPA Target_dup']+' '+dfTrans.loc[mask, 'IPA Target_dup']\
+                            +' \ '+dfTrans.loc[mask, 'IPA Target_dup']                                                                                                                                             
                                                                                                                                                                                                                                                                                                                                                                                                                                                
                             # Create DataFrame Series from replace counts for current column/probe administration
                             probe_counts = pd.Series(sheet_rep_dict)
@@ -535,7 +540,7 @@ with change_dir(os.path.normpath(xls_dir)):
                                     print('saving to csv directory')
                                 # Change to new subdirectory
                                 with change_dir(os.path.join(cwd, 'csv')):                                
-                                    df_sheet.filter(['Target','Orthography','IPA Target_dup', col, 'DI', 'Notes', 'NumProductions','Speaker', 'CA', 'Probe', 'Session'], axis=1).rename(columns={'IPA Target_dup':'IPA Target', col:'IPA Actual'}).to_csv(name + '_' + sheet + '_' + col + '.csv', encoding = 'utf-8', index = False)        
+                                    dfTrans.filter(['Target','Orthography','IPA Target_dup', col, 'DI', 'Notes', 'NumProductions','Speaker', 'CA', 'Probe', 'Session'], axis=1).rename(columns={'IPA Target_dup':'IPA Target', col:'IPA Actual'}).to_csv(name + '_' + sheet + '_' + col + '.csv', encoding = 'utf-8', index = False)        
             print(name,sheet, "Done")
         print(name, "Done")     
     print("All files in directory complete")
