@@ -314,6 +314,8 @@ with change_dir(os.path.normpath(xls_dir)):
                            
                         else:                                               
                             ## Working with current probe administration column
+                            ## Copy and work from copy of dataframe
+                            dfTrans = df_sheet[['Word', 'Target', col, ]]
                             
                             # Populate DI column (delayed/direct imitation) locating [] in cells.
                             df_sheet['DI'] = np.where(df_sheet[col].str.contains(u'\[\]|□', re.UNICODE, regex=True).fillna(False), 1, '')
@@ -359,7 +361,9 @@ with change_dir(os.path.normpath(xls_dir)):
                             excludedList = []
                             for item in excludeList:
                                 
-                                ### CHANGE SO THIS EDITS THE ORTHOGRAPHY TIER INSTEAD???
+                                ### CURRENTLY ONLY WORKS IF THERE IS ONLY ONE OCCURRENCE PER PARTICIPANT.
+                                ## Does not work for "that" or "that one"
+                                ## Also leaves "'" and "(" in the excel?
                                 if len(df_sheet[df_sheet[col].astype(str).str.contains(item)]) == 1:
                                     excludedList.append(item)
                                     # Get row index of item
