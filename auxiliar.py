@@ -15,6 +15,7 @@ import pandas as pd
 # May also require xlrd install as dependency for pandas
 import regex as re
 from six.moves import input
+# import csv
 import unicodecsv as csv
 
 # Establish origin directory and context navigation
@@ -39,11 +40,13 @@ def change_dir(newdir):
     finally:
         os.chdir(prevdir)
 
-"(incomplete transcription)"
+
 
 excludeList = ['(clock)', '(eat it)', '(pole)', 
             '(pulling)', '(sweatshirt)', '(that one)', '(that)', '(thunder)',
             'ziggy', 'pitch', 'quɑrter', 'nose', "'fire'"]
+
+removeList = excludeList + ["(incomplete transcription)", "ɴʀ", "NR", "\[\]", "", "ᵗ", "□", "tuntun", "goʊːt"]
 
 def accessExcelDict(xlsDirName):
     
@@ -87,7 +90,7 @@ def accessExcelGenerator(sheetSelection='probes'):
     dictionaries of DataFrames, iterate through each DataFrame.
     
     Parameters: 
-        sheetSelection : str of Excel sheets extract.
+        sheetSelection : str indicating which Excel sheets to extract.
             'probes' : (default) every probe sheet    
             'allsheets' : every sheet, including 'Copyright', 'Probe Schedule'
             a probe name : matches and extracts only the given probe
@@ -238,6 +241,8 @@ def combiningStrip(text):
     Parameters:
         text : string
     
+    Requires regex module as re
+    
     Return string with combining characters removed
     """
     
@@ -249,13 +254,41 @@ def combiningStrip(text):
                         r'\p{InSpacing_Modifier_Letters}',
                         r'\p{InCombining_Diacritical_Marks_Extended}'
                         r'\p{InCombining_Diacritical_Marks_Supplement}']
+    
+    additionalChars = [r'ᴸ', r'ᵇ', r':', r'<', r'←', r'=', r"'", r"‚"]
 
-    pattern = r'(' + r'|'.join(unicodeBlockList) + r')'
+    pattern = r'(' + r'|'.join(unicodeBlockList+additionalChars) + r')'
     pattern = re.compile(pattern)
     # re.search(pattern, text)
     result = re.subn(pattern, '', text)
     
     return result[0]
+
+def reDiac():
+    
+    """
+    Generate regex pattern to locate diacritics
+    
+    Requires regex module as re
+    
+    Return compiled regex pattern
+    """
+    
+    assert type(text) is str   
+    
+    unicodeBlockList = [r'\p{InCombining_Diacritical_Marks_for_Symbols}',
+                        r'\p{InSuperscripts_and_Subscripts}',
+                        r'\p{InCombining_Diacritical_Marks}',
+                        r'\p{InSpacing_Modifier_Letters}',
+                        r'\p{InCombining_Diacritical_Marks_Extended}'
+                        r'\p{InCombining_Diacritical_Marks_Supplement}']
+
+    additionalChars = [r'ᴸ', r'ᵇ', r':', r'<', r'←', r'=', r"'", r"‚"]
+
+    pattern = r'(' + r'|'.join(unicodeBlockList+additionalChars) + r')'
+    pattern = re.compile(pattern)
+    
+    return pattern
 
 
 def extractSegments(segmentType):
@@ -276,10 +309,11 @@ def extractSegments(segmentType):
     Returns list of unique results and saves as csv in 'info' directory
     """
     
-    assert segmentType in ['phones', 'compounds', 'characters'], """
+    assert segmentType in ['phones', 'compounds', 'characters', 'full_compounds'], """
     segmentType must be specified as:
         'phones' for all unitary and multi-component phones with diacritics
         'compounds' for base compound phones only
+        'full_compounds' for compound phones with diacritics
         'characters' for all characters"""
         
     xlsDict = accessExcelDict('excel')
@@ -299,7 +333,7 @@ def extractSegments(segmentType):
                     if col == 'Word':
                         continue
                     # Remove items from excludeList
-                    for item in excludeList:
+                    for item in removeList:
                         dfSheet[col] = dfSheet[col].str.replace(
                                 item, '', re.UNICODE)                   
                     else:
@@ -310,7 +344,10 @@ def extractSegments(segmentType):
                             dfSheetIPA = dfSheet[col].map(
                                     lambda x: combiningStrip(str(x)))
                             dfSheetIPA = dfSheetIPA.str.findall(
-                                    r'\S{2,}', re.UNICODE)
+                                    r'(?<!=̂̂̂)\S{2,}', re.UNICODE)
+                        if segmentType == 'full_compounds':
+                            dfSheetIPA = dfSheet[col].str.findall(
+                                    r'\S{2,}', re.UNICODE)                            
                         if segmentType == 'characters':
                             dfSheetIPA = dfSheet[col].str.findall(
                                     r'\S', re.UNICODE)
@@ -338,6 +375,32 @@ def extractSegments(segmentType):
     print(f"'{segmentType}.csv' created in 'info' directory.")
     return result
 
+# IN PROGRESS
+"""
+def locateSegments():
+    # Get list of full compound phones
+    segments = []
+    output = pd.DataFrame()
+    with enter_dir('info'):
+        with open('full_compounds.csv') as csvfile:
+            reader = csv.reader(csvfile)
+            for line in reader:
+                segments.append(line[0])
+    for partID, probe, df in accessExcelGenerator():        
+               
+        
+        for col in df.columns:
+            if col == 'Target' or col == 'Word':
+                continue
+            else:                
+                for i, row in df.iterrows():
+                    df[col].astype(str).str.findall(r'\S{2,}')
+                
+                    row = df[df[col].astype(str).str.contains(r'\S{2,}')]
+
+    return
+"""
+extractSegments('compounds')
 
 # Testing 
 df = pd.DataFrame({'Word' : ['Alpha', 'Beta', 'Comma', 'Delta'], 

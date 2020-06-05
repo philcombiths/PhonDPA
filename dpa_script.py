@@ -308,9 +308,6 @@ with change_dir(os.path.normpath(xls_dir)):
                             if cur_rep_count > 0:
                                 print('************************************')
                                 print(u'{} instances of {} replaced with {}'.format(cur_rep_count, u'loag', u'loaf'))                                                                                                                                 
-
-                            # Update unique word_list
-                            word_list = list(set(word_list+df_sheet[col].tolist()))
                            
                         else:                                               
                             ## Working with current probe administration column
@@ -377,14 +374,16 @@ with change_dir(os.path.normpath(xls_dir)):
                                     # also replace item in index column
                                     dfTrans.rename(index={rowIndex[0]:item},inplace=True)
 
+
+                            # Update unique word_list
+                            word_list = list(set(word_list+df_sheet['Word'].tolist()))
                             
                             # Populate IPA Target Tier with target_dict.csv
-                            dfTrans = dfTrans.set_index('Word', drop=False)
+                            dfTrans.set_index('Word', drop=False, inplace=True)
                             dfTrans['IPA Target'] = pd.Series(target_dict, name='IPA Target')
                             
                             # Populate Notes Tier... other stuff?                
                             
-
                                     
                             ## Replacements applying to all data go here:
                             
