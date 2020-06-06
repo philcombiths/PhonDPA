@@ -42,3 +42,35 @@ def regexPattern(prefix = None, suffix = None, groups = None):
     print("*****************************************")
     print(r'|'.join(revRegexList))
     return pattern
+
+def elementwisePattern(between = None, frame = None):
+
+    """
+    Generates a string modifying elements of a string rom user input: 
+        a column of entries separated by newline
+        
+    Parameters:
+        between: str. default None. str to add between 1st and 2nd element
+        frame: str. default None. str to add around each element
+    
+    Returns modified string and prints to console.
+    """
+    
+    elementEntries = input('Paste column of entries:')
+    elementEntriesList = elementEntries.split("\n")
+    newEntriesList = []
+    for entry in elementEntriesList:
+        newEntry = ''
+        for i, element in enumerate(entry):
+            if frame != None:
+                newElement = frame[0]+element+frame[1]
+            else:
+                newElement = element
+            if between != None and i == 0:
+                newEntry += newElement+between
+            else:
+                newEntry += newElement 
+        newEntriesList.append(newEntry)
+    print(','.join(newEntriesList))
+    return ','.join(newEntriesList)
+    

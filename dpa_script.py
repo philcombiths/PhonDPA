@@ -86,6 +86,16 @@ reader1 = csv.DictReader(open(other_chars_path, encoding = 'utf-8'))
 for row in reader1:
     other_chars_dict = OrderedDict(row)
 
+# Create dictionary compounds_dict from csv   
+compounds_dict_path = os.path.join(cwd,r"dicts\compounds_dict.csv")
+dummylist = []
+with open(compounds_dict_path, 'r', encoding = 'utf-8') as f:
+    reader = csv.reader(f)
+    headers = next(reader)
+    for row in reader:
+        dummylist.append(OrderedDict(list(zip(headers, row))))
+compounds_dict = dummylist[0]
+
 # Create ordered dictionary superscript_dict_initial from csv
 superscript_dict_initial_path = os.path.join(cwd,r"dicts\superscript_dict_initial.csv")
 dummylist = []
@@ -143,6 +153,8 @@ target_dict_path = os.path.join(cwd,r"dicts\target_dict.csv")
 reader5 = csv.DictReader(open(target_dict_path, encoding = 'utf-8')) 
 for row in reader5:
     target_dict = dict(row)
+    
+
 
 # Preset xls directory
 xls_dir = os.path.join(cwd,r'excel')
@@ -412,7 +424,15 @@ with change_dir(os.path.normpath(xls_dir)):
                                     print(u'{} instances of {} replaced with {}'.format(cur_rep_count, key, other_chars_dict[key]))    
 
                             # Address combo segments
-                            
+                            for key in compounds_dict:
+                                # cur_rep_count to track instances of replacements. In unicode
+                                cur_rep_count = dfTrans[col].str.count(six.text_type(key), re.UNICODE).sum()
+                                sheet_rep_dict[key+u'_to_'+ compounds_dict[key]] += cur_rep_count             
+                                # replace all instances of dictionary key with corresponding value. In unicode
+                                dfTrans[col] = dfTrans[col].str.replace(six.text_type(key), six.text_type(compounds_dict[key]), re.UNICODE)
+                                if cur_rep_count > 0:
+                                    print('************************************')
+                                    print(u'{} instances of {} replaced with {}'.format(cur_rep_count, key, compounds_dict[key]))    
                             
                             # Replace whitespaces, but leave space between multiple productions
                             # Mask excluding cells with multiple productions (these white spaces should remain)
@@ -581,4 +601,7 @@ with change_dir(os.path.normpath(xls_dir)):
 
 # ToDo
     # Add ligature to compound phones.
+        # Compound dict in progress
+        # Implement compound dict
+        # Get feedback from Jessica
 
