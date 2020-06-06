@@ -344,10 +344,10 @@ def extractSegments(segmentType):
                             dfSheetIPA = dfSheet[col].map(
                                     lambda x: combiningStrip(str(x)))
                             dfSheetIPA = dfSheetIPA.str.findall(
-                                    r'(?<!̂)[^̂\s]\S+', re.UNICODE)
+                                    r'\S{2,}', re.UNICODE)
                         if segmentType == 'full_compounds':
                             dfSheetIPA = dfSheet[col].str.findall(
-                                    r'\S{2,}', re.UNICODE)                            
+                                    r'(?<!̂)\S{2,}', re.UNICODE)                            
                         if segmentType == 'characters':
                             dfSheetIPA = dfSheet[col].str.findall(
                                     r'\S', re.UNICODE)
@@ -401,7 +401,7 @@ def locateSegments():
     return
 """
 
-extractSegments('compounds')
+extractSegments('full_compounds')
 
 # Testing 
 df = pd.DataFrame({'Word' : ['Alpha', 'Beta', 'Comma', 'Delta'], 
