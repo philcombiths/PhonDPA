@@ -46,7 +46,7 @@ excludeList = ['(clock)', '(eat it)', '(pole)',
             '(pulling)', '(sweatshirt)', '(that one)', '(that)', '(thunder)',
             'ziggy', 'pitch', 'quɑrter', 'nose', "'fire'"]
 
-removeList = excludeList + ["(incomplete transcription)", "ɴʀ", "NR", "\[\]", "", "ᵗ", "□", "tuntun", "goʊːt"]
+removeList = excludeList + ["(incomplete transcription)", "ɴʀ", "NR", "\[\]", "", "ᵗ", "□", "tuntun", "goʊːt", "ʃiz"]
 
 def accessExcelDict(xlsDirName):
     
@@ -404,9 +404,3 @@ def locateSegments():
 extractSegments('full_compounds')
 
 # Testing 
-df = pd.DataFrame({'Word' : ['Alpha', 'Beta', 'Comma', 'Delta'], 
-                   'Transcription' : ['ælfə', 'beɪɾə', 'kɑmə', "faɪjəɹ   'fire'"]})
-    
-newDF = df[df['Transcription'].str.contains('fire')]
-
-df.loc[newDF.index, 'Word'] = 'fire'
