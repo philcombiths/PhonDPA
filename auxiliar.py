@@ -401,6 +401,4 @@ def locateSegments():
     return
 """
 
-extractSegments('full_compounds')
-
 # Testing 
