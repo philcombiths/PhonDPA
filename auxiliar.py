@@ -17,6 +17,7 @@ import regex as re
 from six.moves import input
 # import csv
 import unicodecsv as csv
+import io
 
 # Establish origin directory and context navigation
 os.chdir(os.path.dirname(sys.argv[0])) 
@@ -374,6 +375,81 @@ def extractSegments(segmentType):
             writer.writerow([e])
     print(f"'{segmentType}.csv' created in 'info' directory.")
     return result
+
+def multProdsCount(csvDir = 'csv'):
+    
+    """
+    Searches a directory of csv files and adds the number of "multiple
+    productions"
+    
+    Parameters:
+        csvDir : str indicating csv directory to search. Default 'csv'
+    
+    Returns multiple productions count as float and prints to console.
+    """
+   
+    pattern = re.compile =r',.*,.*,.*,.*,.*,(\d\.\d),'
+    mpCount = 0
+        
+    with enter_dir(csvDir):   
+        # Create list of csv files in subdirectories
+        csv_files = os.listdir(os.getcwd())
+        # Loop through files in directory
+        print('Searching all csv files in directory...')
+        for cur_csv in csv_files:
+            # open CSV file in read mode with UTF-8 encoding
+            with io.open(cur_csv, mode='r', encoding='utf-8') as current_csv:
+                # Create string variable from CSV
+                csv_str = current_csv.read()
+                result = re.findall(pattern, csv_str)
+                for numStr in result:
+                    mpCount += float(numStr)
+        print(mpCount)
+        return mpCount
+    
+
+def extractMultProds(csvDir = 'csv'):
+    
+    """
+    Searches a directory of csv files and adds the number of "multiple
+    productions"
+    
+    Parameters:
+        csvDir : str indicating csv directory to search. Default 'csv'
+    
+    Returns multiple productions count as float and prints to console.
+    """
+   
+    pattern = re.compile =r'(.*,.*,.*,.*,.*,.*,)(\d\.\d)(,.*)'
+    mpCount = 0
+        
+    with enter_dir(csvDir):   
+        # Create list of csv files in subdirectories
+        csv_files = os.listdir(os.getcwd())
+        # Loop through files in directory
+        print('Searching all csv files in directory...')
+        matchRows = []
+        for cur_csv in csv_files:
+            # open CSV file in read mode with UTF-8 encoding
+            with io.open(cur_csv, mode='r', encoding='utf-8') as current_csv:
+                # Create string variable from CSV
+                csv_str = current_csv.read()
+                result = re.findall(pattern, csv_str)
+                for match in result:
+                    #for match[1] in result:
+                    #    mpCount += float(numStr)
+                    matchRow = ''.join(match)
+                    matchRows.append(matchRow)
+        
+        
+    with enter_dir('info'):
+        with io.open(f'{csvDir}_mult_prod_matches.csv', 'wb') as f:
+            writer = csv.writer(f)
+            for row in matchRows:
+                writer.writerow([row])
+                    
+    return matchRows
+    
 
 # IN PROGRESS
 """
