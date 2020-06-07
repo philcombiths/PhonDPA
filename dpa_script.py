@@ -394,10 +394,21 @@ with change_dir(os.path.normpath(xls_dir)):
                             dfTrans.set_index('Word', drop=False, inplace=True)
                             dfTrans['IPA Target'] = pd.Series(target_dict, name='IPA Target')
                             
-                            # Populate Notes Tier... other stuff?                
-                            
+                            # Populate Notes Tier... other stuff?                                      
                                     
-                            ## Replacements applying to all data go here:
+                            ######## Replacements applying to all data go here:
+                            ## 1. Replace delayed imitation notion
+                            ## 2. Replace miscellanous non-standard IPA characters
+                            ## 3. Replace compound segments
+                            ## 4. Replace most whitespaces (except multiple productions)
+                            ## 5. Replace initial superscript diacritics.
+                            ##    This i dones before non-initial diacritics 
+                            ##    because this is the special case. Non-initial
+                            ##    diacritics are assumed to be those that remain.
+                            ## 6. Repeat initial superscript diacritics 2 more
+                            ##    times to capture segments with multiple diacritics
+                            ## 7. Replace noninitial superscript diacritics
+                            ## 8. Duplicate multiple-production words
                             
                             # Replace [] and □ with blank
                             # cur_rep_count to track instances of replacements. In unicode
