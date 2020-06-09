@@ -47,7 +47,13 @@ excludeList = ['(clock)', '(eat it)', '(pole)',
             '(pulling)', '(sweatshirt)', '(that one)', '(that)', '(thunder)',
             'ziggy', 'pitch', 'quɑrter', 'nose', "'fire'"]
 
-removeList = excludeList + ["(incomplete transcription)", "ɴʀ", "NR", "\[\]", "", "ᵗ", "□", "tuntun", "goʊːt", "ʃiz"]
+excludeListSpaces = ['       (clock)', '      (eat it)', ' (pole)', 
+            '     (pulling)', '     (sweatshirt)', ' (that one)', '   (that)', 
+            ' (that)', '   (thunder)', ' ziggy', ' pitch   ', ' quɑrter', 
+            '      nose', "  'fire'"]
+
+removeList = excludeList + ["(incomplete transcription)", "ɴʀ", "NR", "\[\]", 
+                            "", "ᵗ", "□", "tuntun", "goʊːt", "ʃiz"]
 
 def accessExcelDict(xlsDirName):
     
@@ -333,7 +339,7 @@ def extractSegments(segmentType):
                         continue
                     if col == 'Word':
                         continue
-                    # Remove items from excludeList
+                    # Remove items from removeList
                     for item in removeList:
                         dfSheet[col] = dfSheet[col].str.replace(
                                 item, '', re.UNICODE)                   
@@ -449,32 +455,5 @@ def extractMultProds(csvDir = 'csv'):
                 writer.writerow([row])
                     
     return matchRows
-    
-
-# IN PROGRESS
-"""
-def locateSegments():
-    # Get list of full compound phones
-    segments = []
-    output = pd.DataFrame()
-    with enter_dir('info'):
-        with open('full_compounds.csv') as csvfile:
-            reader = csv.reader(csvfile)
-            for line in reader:
-                segments.append(line[0])
-    for partID, probe, df in accessExcelGenerator():        
-               
-        
-        for col in df.columns:
-            if col == 'Target' or col == 'Word':
-                continue
-            else:                
-                for i, row in df.iterrows():
-                    df[col].astype(str).str.findall(r'\S{2,}')
-                
-                    row = df[df[col].astype(str).str.contains(r'\S{2,}')]
-
-    return
-"""
 
 # Testing 

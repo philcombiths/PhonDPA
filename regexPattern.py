@@ -43,15 +43,17 @@ def regexPattern(prefix = None, suffix = None, groups = None):
     print(r'|'.join(revRegexList))
     return pattern
 
-def elementwisePattern(between = None, frame = None):
+def elementwisePattern(between = None, frame = None, prefix = None, suffix = None):
 
     """
-    Generates a string modifying elements of a string rom user input: 
+    Generates a string modifying elements of a string from user input: 
         a column of entries separated by newline
         
     Parameters:
         between: str. default None. str to add between 1st and 2nd element
         frame: str. default None. str to add around each element
+        prefix: str. default None. prefix to each entry
+        suffix: str. default None. suffix to each entry
     
     Returns modified string and prints to console.
     """
@@ -69,8 +71,13 @@ def elementwisePattern(between = None, frame = None):
             if between != None and i == 0:
                 newEntry += newElement+between
             else:
-                newEntry += newElement 
+                newEntry += newElement
+        if prefix != None:
+            newEntry = prefix+newEntry
+        if suffix != None:
+            newEntry = newEntry+suffix
         newEntriesList.append(newEntry)
     print(','.join(newEntriesList))
     return ','.join(newEntriesList)
-    
+
+elementwisePattern(frame = '()', prefix = '(?<!̂)')

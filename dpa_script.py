@@ -46,7 +46,7 @@ from contextlib import contextmanager
 import six
 from six.moves import zip
 from six.moves import input
-from auxiliar import excludeList
+from auxiliar import excludeListSpaces
 
 # Set default directory to location of script
 os.chdir(os.path.dirname(sys.argv[0]))
@@ -338,7 +338,7 @@ with change_dir(os.path.normpath(xls_dir)):
                             # Number of Productions Tier
                             # Multiple productions = when there is a 4 spaces + character not followed by spaces + ']'
                             ## Changed to 5 spaces
-                            dfTrans['NumProductions'] = np.where(dfTrans[col].str.contains('     [^\s](?! *\])', regex=True).fillna(False), 1.0+dfTrans[col].str.count('     [^\s](?! *\])', re.UNICODE), '')                       
+                            dfTrans['NumProductions'] = np.where(dfTrans[col].str.contains('    [^\s](?! *\])', regex=True).fillna(False), 1.0+dfTrans[col].str.count('    [^\s](?! *\])', re.UNICODE), '')                       
                         
                             # NR "denotes 'no response'" - new column entry (Notes
                             dfTrans['Notes'] = np.where(dfTrans[col].str.contains(r'NR|ɴʀ', re.UNICODE, regex=True).fillna(False), 'No Response', "") 
@@ -369,22 +369,17 @@ with change_dir(os.path.normpath(xls_dir)):
                                         dfTrans['CA'] = CA_dict['Ver B ' + col]                                                                                                                                                                                                                               
 
 
-                            # Replace items from excludeList
+                            # Replace items from excludeListSpaces
                             excludedList = []
-                            for item in excludeList:
-                                
-                                ## Also must change the IPA Target
-                                
-                                if len(dfTrans[dfTrans[col].astype(str).str.contains(item)]) == 1:
+                            for item in excludeListSpaces:                             
+                                if len(dfTrans[dfTrans[col].astype(str).str.contains(item, regex=False)]) == 1:
                                     excludedList.append(item)
                                     # Get row index of item
-                                    rowIndex = dfTrans[dfTrans[col].astype(str).str.contains(item)].index
+                                    rowIndex = dfTrans[dfTrans[col].astype(str).str.contains(item, regex=False)].index
                                     # remove item from cell
                                     dfTrans[col] = dfTrans[col].str.replace(item, '', regex=False)
-                                    replaceList = ["'", "(", ")"]
                                     # remove symbols around word
-                                    for c in replaceList:
-                                        item = item.replace(c, '')
+                                    item = item.strip("'() ")
                                     # replace item in word column
                                     dfTrans.loc[rowIndex, 'Word'] = item
                                    # Add Note
@@ -479,9 +474,9 @@ with change_dir(os.path.normpath(xls_dir)):
                                 #print('************************************')
                                 #print(u'{} instances of {} removed from records with multiple utterances'.format(cur_rep_count, 'whitespace'))                          
 
-
-
-
+                            ### Superscript replacement must occur after
+                            ### whitespace removal due to current regex used
+                            
                             # replace superscripts superscript_dict_initial.csv                
                             for key in superscript_dict_initial:
                                 # cur_rep_count to track instances of replacements. In unicode
@@ -564,7 +559,7 @@ with change_dir(os.path.normpath(xls_dir)):
                             mask = dfTrans.filter(['IPA Target_dup',col,'NumProductions'], axis=1).NumProductions == '5.0'                            
                             dfTrans.loc[mask, 'IPA Target_dup'] = dfTrans.loc[mask, 'IPA Target_dup']+' '+dfTrans.loc[mask, 'IPA Target_dup']+' '+dfTrans.loc[mask, 'IPA Target_dup']+' '+dfTrans.loc[mask, 'IPA Target_dup']\
                             +' \ '+dfTrans.loc[mask, 'IPA Target_dup']                                                                                                                                             
-                                                                                                                                                                                                                                                                                                                                                                                                                                               
+                                                                                                                                                                                                                                                                                                                                                                                                              
                             # Create DataFrame Series from replace counts for current column/probe administration
                             probe_counts = pd.Series(sheet_rep_dict)
                             # Add current column Series replace counts to DataFrame of counts for this participant
@@ -622,12 +617,6 @@ with change_dir(os.path.normpath(xls_dir)):
         with change_dir(os.path.join(cwd, 'info')):                                            
                 pd.DataFrame(word_list).to_csv('word_list.csv', header = ['Orthography'], 
                             encoding = 'utf-8', index = False)
-    print('word_list.csv created')    
+    print('word_list.csv created')
 
-
-# ToDo
-    # Add ligature to compound phones.
-        # Compound dict in progress
-        # Implement compound dict
-        # Get feedback from Jessica
 
