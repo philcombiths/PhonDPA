@@ -15,7 +15,10 @@ import pandas as pd
 # May also require xlrd install as dependency for pandas
 import regex as re
 from six.moves import input
+# import csv
 import unicodecsv as csv
+import io
+from collections import Counter
 
 # Establish origin directory and context navigation
 os.chdir(os.path.dirname(sys.argv[0])) 
@@ -40,9 +43,18 @@ def change_dir(newdir):
         os.chdir(prevdir)
 
 
-excludeList = ['(clock)', '(eat it)', '(incomplete transcription)', '(pole)', 
+
+excludeList = ['(clock)', '(eat it)', '(pole)', 
             '(pulling)', '(sweatshirt)', '(that one)', '(that)', '(thunder)',
             'ziggy', 'pitch', 'quɑrter', 'nose', "'fire'"]
+
+excludeListSpaces = ['       (clock)', '      (eat it)', ' (pole)', 
+            '     (pulling)', '     (sweatshirt)', ' (that one)', '   (that)', 
+            ' (that)', '   (thunder)', ' ziggy', ' pitch   ', ' quɑrter', 
+            '      nose', "  'fire'"]
+
+removeList = excludeList + ["(incomplete transcription)", "ɴʀ", "NR", "\[\]", 
+                            "", "ᵗ", "□", "tuntun", "goʊːt", "ʃiz"]
 
 def accessExcelDict(xlsDirName):
     
@@ -86,7 +98,7 @@ def accessExcelGenerator(sheetSelection='probes'):
     dictionaries of DataFrames, iterate through each DataFrame.
     
     Parameters: 
-        sheetSelection : str of Excel sheets extract.
+        sheetSelection : str indicating which Excel sheets to extract.
             'probes' : (default) every probe sheet    
             'allsheets' : every sheet, including 'Copyright', 'Probe Schedule'
             a probe name : matches and extracts only the given probe
@@ -237,6 +249,8 @@ def combiningStrip(text):
     Parameters:
         text : string
     
+    Requires regex module as re
+    
     Return string with combining characters removed
     """
     
@@ -248,13 +262,41 @@ def combiningStrip(text):
                         r'\p{InSpacing_Modifier_Letters}',
                         r'\p{InCombining_Diacritical_Marks_Extended}'
                         r'\p{InCombining_Diacritical_Marks_Supplement}']
+    
+    additionalChars = [r'ᴸ', r'ᵇ', r':', r'<', r'←', r'=', r"'", r"‚"]
 
-    pattern = r'(' + r'|'.join(unicodeBlockList) + r')'
+    pattern = r'(' + r'|'.join(unicodeBlockList+additionalChars) + r')'
     pattern = re.compile(pattern)
     # re.search(pattern, text)
     result = re.subn(pattern, '', text)
     
     return result[0]
+
+def reDiac():
+    
+    """
+    Generate regex pattern to locate diacritics
+    
+    Requires regex module as re
+    
+    Return compiled regex pattern
+    """
+    
+    assert type(text) is str   
+    
+    unicodeBlockList = [r'\p{InCombining_Diacritical_Marks_for_Symbols}',
+                        r'\p{InSuperscripts_and_Subscripts}',
+                        r'\p{InCombining_Diacritical_Marks}',
+                        r'\p{InSpacing_Modifier_Letters}',
+                        r'\p{InCombining_Diacritical_Marks_Extended}'
+                        r'\p{InCombining_Diacritical_Marks_Supplement}']
+
+    additionalChars = [r'ᴸ', r'ᵇ', r':', r'<', r'←', r'=', r"'", r"‚"]
+
+    pattern = r'(' + r'|'.join(unicodeBlockList+additionalChars) + r')'
+    pattern = re.compile(pattern)
+    
+    return pattern
 
 
 def extractSegments(segmentType):
@@ -275,10 +317,11 @@ def extractSegments(segmentType):
     Returns list of unique results and saves as csv in 'info' directory
     """
     
-    assert segmentType in ['phones', 'compounds', 'characters'], """
+    assert segmentType in ['phones', 'compounds', 'characters', 'full_compounds'], """
     segmentType must be specified as:
         'phones' for all unitary and multi-component phones with diacritics
         'compounds' for base compound phones only
+        'full_compounds' for compound phones with diacritics
         'characters' for all characters"""
         
     xlsDict = accessExcelDict('excel')
@@ -297,8 +340,8 @@ def extractSegments(segmentType):
                         continue
                     if col == 'Word':
                         continue
-                    # Remove items from excludeList
-                    for item in excludeList:
+                    # Remove items from removeList
+                    for item in removeList:
                         dfSheet[col] = dfSheet[col].str.replace(
                                 item, '', re.UNICODE)                   
                     else:
@@ -310,6 +353,9 @@ def extractSegments(segmentType):
                                     lambda x: combiningStrip(str(x)))
                             dfSheetIPA = dfSheetIPA.str.findall(
                                     r'\S{2,}', re.UNICODE)
+                        if segmentType == 'full_compounds':
+                            dfSheetIPA = dfSheet[col].str.findall(
+                                    r'(?<!̂)\S{2,}', re.UNICODE)                            
                         if segmentType == 'characters':
                             dfSheetIPA = dfSheet[col].str.findall(
                                     r'\S', re.UNICODE)
@@ -337,6 +383,129 @@ def extractSegments(segmentType):
     print(f"'{segmentType}.csv' created in 'info' directory.")
     return result
 
+def multProdsCount(csvDir = 'csv'):
+    
+    """
+    Searches a directory of csv files and adds the number of "multiple
+    productions"
+    
+    Parameters:
+        csvDir : str indicating csv directory to search. Default 'csv'
+    
+    Returns multiple productions count as float and prints to console.
+    """
+   #Check that edit worked
+    pattern = re.compile =r',.*,.*,.*,.*,.*,(\d.\d),'
+    mpCount = 0
+        
+    with enter_dir(csvDir):   
+        # Create list of csv files in subdirectories
+        csv_files = os.listdir(os.getcwd())
+        # Loop through files in directory
+        print('Searching all csv files in directory...')
+        for cur_csv in csv_files:
+            # open CSV file in read mode with UTF-8 encoding
+            with io.open(cur_csv, mode='r', encoding='utf-8') as current_csv:
+                # Create string variable from CSV
+                csv_str = current_csv.read()
+                result = re.findall(pattern, csv_str)
+                for numStr in result:
+                    mpCount += float(numStr)
+        print(mpCount)
+        return mpCount
+    
 
-# ToDo: 
-# identify location of unique segment combinations                  
+def extractMultProds(csvDir = 'csv'):
+    
+    """
+    Searches a directory of csv files and adds the number of "multiple
+    productions"
+    
+    Parameters:
+        csvDir : str indicating csv directory to search. Default 'csv'
+    
+    Returns multiple productions count as float and prints to console.
+    """
+    # Check that edit worked
+    pattern = re.compile =r'(.*,.*,.*,.*,.*,.*,)(\d.\d)(,.*)'
+    mpCount = 0
+        
+    with enter_dir(csvDir):   
+        # Create list of csv files in subdirectories
+        csv_files = os.listdir(os.getcwd())
+        # Loop through files in directory
+        print('Searching all csv files in directory...')
+        matchRows = []
+        for cur_csv in csv_files:
+            # open CSV file in read mode with UTF-8 encoding
+            with io.open(cur_csv, mode='r', encoding='utf-8') as current_csv:
+                # Create string variable from CSV
+                csv_str = current_csv.read()
+                result = re.findall(pattern, csv_str)
+                for match in result:
+                    #for match[1] in result:
+                    #    mpCount += float(numStr)
+                    matchRow = ''.join(match)
+                    matchRows.append(matchRow)
+        
+        
+    with enter_dir('info'):
+        with io.open(f'{csvDir}_mult_prod_matches.csv', 'wb') as f:
+            writer = csv.writer(f)
+            for row in matchRows:
+                writer.writerow([row])
+                    
+    return matchRows
+
+    
+def postProcessingReplacements(csvDir = 'csv'):
+    # Read replacements table
+    with open('dicts/replacements_table.csv', mode='r', encoding='utf-8') as f:
+        lines = f.readlines()
+        # Remove trailing whitespace and commas from rows
+        lines = [i.strip().strip(',') for i in lines]
+        # Remove empty rows
+        lines = [i for i in lines if i]
+        # Find row index for original and replacement rows
+        origIndex = lines.index('Original rows go here:')
+        replIndex = lines.index('Replacement rows go here:')
+        originals = lines[origIndex+2:replIndex]
+        replacements = lines[replIndex+2:]
+        assert len(originals) == len(replacements), "Different number of originals and replacements"
+        replList = [(originals[i],replacements[i]) for i in range(len(originals))]
+
+
+    counter = Counter()
+    with enter_dir(csvDir):
+        for fName in os.listdir(os.getcwd()):           
+            if fName.endswith('.csv'):
+                with open(fName, mode = 'r', encoding = 'utf-8') as curCSV:
+                    csvStr = curCSV.read()
+                    revCSVStr = csvStr
+                    for repl in replList:
+                        if repl[0] in csvStr:
+                            counter.update([repl[0]])
+                            revCSVStr = revCSVStr.replace(repl[0], repl[1])
+            if revCSVStr == csvStr:
+                continue
+            else:
+                with open(fName, mode = 'w', encoding='utf-8') as curCSV:                            
+                    curCSV.write(revCSVStr)
+    
+    # Check that all replacements were made. Print warning to console.
+    for line in originals:
+        if line not in counter:
+            print("**********************************************************")
+            print("\tWARNING: Not all replacements were made.")
+            print("\tCheck replacements_table.csv for accuracy.")
+            print("\tLine not replaced:")
+            print(line)
+    
+    return counter
+    
+
+c = postProcessingReplacements('csvTest2')
+
+#testDF = pd.DataFrame({'NP':['2.0']})
+#pd.to_numeric(testDF['NP'], downcast = 'integer')
+# Testing 
