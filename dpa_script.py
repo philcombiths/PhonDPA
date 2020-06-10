@@ -46,11 +46,15 @@ from contextlib import contextmanager
 import six
 from six.moves import zip
 from six.moves import input
-from auxiliar import excludeListSpaces
+from auxiliar import excludeListSpaces, postProcessingReplacements
+
 
 # Set default directory to location of script
 os.chdir(os.path.dirname(sys.argv[0]))
-cwd = os.getcwd()        
+cwd = os.getcwd()    
+
+# Set xls directory
+xls_dir = os.path.join(cwd,r'excel')    
 
 # Create contextmanager function that changes directory then returns to 
 # original directory upon completion
@@ -154,10 +158,6 @@ reader5 = csv.DictReader(open(target_dict_path, encoding = 'utf-8'))
 for row in reader5:
     target_dict = dict(row)
     
-
-
-# Preset xls directory
-xls_dir = os.path.join(cwd,r'excel')
 
 # If preset directory is not present, get user input
 try:
@@ -559,7 +559,12 @@ with change_dir(os.path.normpath(xls_dir)):
                             mask = dfTrans.filter(['IPA Target_dup',col,'NumProductions'], axis=1).NumProductions == '5.0'                            
                             dfTrans.loc[mask, 'IPA Target_dup'] = dfTrans.loc[mask, 'IPA Target_dup']+' '+dfTrans.loc[mask, 'IPA Target_dup']+' '+dfTrans.loc[mask, 'IPA Target_dup']+' '+dfTrans.loc[mask, 'IPA Target_dup']\
                             +' \ '+dfTrans.loc[mask, 'IPA Target_dup']                                                                                                                                             
-                                                                                                                                                                                                                                                                                                                                                                                                              
+                            
+                            # Change NumProductions column to integer type
+                            dfTrans['NumProductions'] = pd.to_numeric(
+                                    dfTrans['NumProductions'], 
+                                    downcast = 'integer')
+                            
                             # Create DataFrame Series from replace counts for current column/probe administration
                             probe_counts = pd.Series(sheet_rep_dict)
                             # Add current column Series replace counts to DataFrame of counts for this participant
@@ -619,4 +624,5 @@ with change_dir(os.path.normpath(xls_dir)):
                             encoding = 'utf-8', index = False)
     print('word_list.csv created')
 
-
+# Replace post-processing errors itemized in replacements_table.csv
+# postProcessingReplacements(csvDir = 'csv')

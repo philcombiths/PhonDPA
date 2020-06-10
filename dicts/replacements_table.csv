@@ -1,0 +1,54 @@
+Original rows go here:,,,,,,,,,,
+Target,Orthography,IPA Target,IPA Actual,DI,Notes,NumProductions,Speaker,CA,Probe,Session
+s m,smell smell,ˈsmɛl ˈsmɛl,θmɛlᵈ̵mɛl,,,2,6380,7;6;14,OCP,OCP 2wk
+t f,telephone,ˈtɛləˌfoʊn,th(incompletetɹanscɹiption),,,,2919,4;4;28,GFTA,GFTA Pre
+r v,carve carve,ˈkɔɹv ˈkɔɹv,dɔːᵗ̵,,,2,1664,4;7;11,CCP,CCP 2mo
+r p,burp burp,ˈbʊɹp ˈbʊɹp,bʊɹˀ̵,1,,2,2093,4;4;9,CCP,CCP Pre
+s k,scarf scarf,ˈskɑɹf ˈskɑɹf,ɡɑɹʰ̵,,,2,2093,4;5;18,OCP,OCP PS
+ʤ,jaw jaw,ˈʤɑ ˈʤɑ,dᶾ̵ɔː,,,2,2647,4;10;14,TP,TP 1
+f j,few few,ˈfju ˈfju,fʷ̵ju,1,,2,3476,3;1;21,OCP,OCP Pre
+s t,toast toast,ˈtoʊst ˈtoʊst,d̥oʊᵗ̵̪,,,2,4746,4;1;9,CCP,CCP Post
+f l,floor floor,ˈfloʊɹ ˈfloʊɹ,hoʊᵊ̵,,,2,4746,3;10;2,OCP,OCP Pre
+d r,drink drink,ˈdɹɪŋk ˈdɹɪŋk,dᶷ̵wɪŋk,,,2,4987,4;5;27,TP,TP 5
+s p,grasp grasp,ˈɡɹæsp ˈɡɹæsp,ɡwæs̪ᵖ̵ ,1,,2,8170,5;0;15,CCP,CCP 2wk
+n z,noise noise,ˈnɔɪz ˈnɔɪz,nɔɪdˢ̵,,,2,8686,5;0;25,PKP,INV BL 2
+d r,draw draw,ˈdɹɔ ˈdɹɔ,dɑʊͦ,,,2,9247,3;9;22,OCP,OCP PS
+s w,swing swing,ˈswɪŋ ˈswɪŋ,ʃwiŋᵍ̵,,,2,9576,3;6;2,OCP,OCP 2wk
+n θ,tenth tenth,ˈtɛnθ ˈtɛnθ,tɛnᵗ̵,,,2,9594,4;9;20,CCP,CCP Post
+f,nose nose,ˈnoʊz ˈnoʊz,soʊz,,Probe target 'face' but child produced 'nose',2,2081,4;4;20,PKP,INV PS 1
+t,eat it eat it,ˈit ɪt ˈit ɪt,iɾɪʔ,,Probe target 'eat' but child produced 'eat it',2,2081,4;3;8,PKP,PKP Pre
+ʧ w,clock clock,ˈklɑk ˈklɑk,dɔk,,Probe target 'watch' but child produced 'clock',2,3920,4;10;8,PKP,PKP Pre
+ʃ,pulling pulling,ˈpʊlɪŋ ˈpʊlɪŋ,pʌlɪŋ,,Probe target 'pushing' but child produced 'pulling',2,3920,5;0;16,PKP,PKP Post
+s w,sweatshirt sweatshirt,ˈswɛtˌʃʊɹt ˈswɛtˌʃʊɹt,fwɛs̹ʊt,,Probe target 'sweater' but child produced 'sweatshirt',2,7055,4;1;29,OCP,OCP 2mo
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+Replacement rows go here:,,,,,,,,,,
+Target,Orthography,IPA Target,IPA Actual,DI,Notes,NumProductions,Speaker,CA,Probe,Session
+s m,smell smell,ˈsmɛl ˈsmɛl,θmɛl ᵈ̵mɛl,,,2,6380,7;6;14,OCP,OCP 2wk
+t f,telephone,ˈtɛləˌfoʊn,,,th (incomplete transcription),,2919,4;4;28,GFTA,GFTA Pre
+r v,carve,ˈkɔɹv,dɔːᵗ,,,,1664,4;7;11,CCP,CCP 2mo
+r p,burp,ˈbʊɹp,bʊɹˀ,1,,,2093,4;4;9,CCP,CCP Pre
+s k,scarf,ˈskɑɹf,ɡɑɹʰ,,,,2093,4;5;18,OCP,OCP PS
+ʤ,jaw,ˈʤɑ,dᶾɔː,,,,2647,4;10;14,TP,TP 1
+f j,few,ˈfju,fʷju,1,,,3476,3;1;21,OCP,OCP Pre
+s t,toast,ˈtoʊst,d̥oʊᵗ̪,,,,4746,4;1;9,CCP,CCP Post
+f l,floor,ˈfloʊɹ,hoʊᵊ,,,,4746,3;10;2,OCP,OCP Pre
+d r,drink,ˈdɹɪŋk,dᶷwɪŋk,,,,4987,4;5;27,TP,TP 5
+s p,grasp,ˈɡɹæsp,ɡwæs̪ᵖ,1,,,8170,5;0;15,CCP,CCP 2wk
+n z,noise,ˈnɔɪz,nɔɪdˢ,,,,8686,5;0;25,PKP,INV BL 2
+d r,draw,ˈdɹɔ,dɑʊͦ,,,,9247,3;9;22,OCP,OCP PS
+s w,swing,ˈswɪŋ,ʃwiŋᵍ,,,,9576,3;6;2,OCP,OCP 2wk
+n θ,tenth,ˈtɛnθ,tɛnᵗ,,,,9594,4;9;20,CCP,CCP Post
+f,nose,ˈnoʊz,soʊz,,Probe target 'face' but child produced 'nose',,2081,4;4;20,PKP,INV PS 1
+t,eat it,ˈit ɪt,iɾ ɪʔ,,Probe target 'eat' but child produced 'eat it',,2081,4;3;8,PKP,PKP Pre
+ʧ w,clock,ˈklɑk,dɔk,,Probe target 'watch' but child produced 'clock',,3920,4;10;8,PKP,PKP Pre
+ʃ,pulling,ˈpʊlɪŋ,pʌlɪŋ,,Probe target 'pushing' but child produced 'pulling',,3920,5;0;16,PKP,PKP Post
+s w,sweatshirt,ˈswɛtˌʃʊɹt,fwɛs̹ʊt,,Probe target 'sweater' but child produced 'sweatshirt',,7055,4;1;29,OCP,OCP 2mo

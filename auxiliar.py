@@ -18,6 +18,7 @@ from six.moves import input
 # import csv
 import unicodecsv as csv
 import io
+from collections import Counter
 
 # Establish origin directory and context navigation
 os.chdir(os.path.dirname(sys.argv[0])) 
@@ -393,8 +394,8 @@ def multProdsCount(csvDir = 'csv'):
     
     Returns multiple productions count as float and prints to console.
     """
-   
-    pattern = re.compile =r',.*,.*,.*,.*,.*,(\d\.\d),'
+   #Check that edit worked
+    pattern = re.compile =r',.*,.*,.*,.*,.*,(\d.\d),'
     mpCount = 0
         
     with enter_dir(csvDir):   
@@ -425,8 +426,8 @@ def extractMultProds(csvDir = 'csv'):
     
     Returns multiple productions count as float and prints to console.
     """
-   
-    pattern = re.compile =r'(.*,.*,.*,.*,.*,.*,)(\d\.\d)(,.*)'
+    # Check that edit worked
+    pattern = re.compile =r'(.*,.*,.*,.*,.*,.*,)(\d.\d)(,.*)'
     mpCount = 0
         
     with enter_dir(csvDir):   
@@ -456,4 +457,55 @@ def extractMultProds(csvDir = 'csv'):
                     
     return matchRows
 
+    
+def postProcessingReplacements(csvDir = 'csv'):
+    # Read replacements table
+    with open('dicts/replacements_table.csv', mode='r', encoding='utf-8') as f:
+        lines = f.readlines()
+        # Remove trailing whitespace and commas from rows
+        lines = [i.strip().strip(',') for i in lines]
+        # Remove empty rows
+        lines = [i for i in lines if i]
+        # Find row index for original and replacement rows
+        origIndex = lines.index('Original rows go here:')
+        replIndex = lines.index('Replacement rows go here:')
+        originals = lines[origIndex+2:replIndex]
+        replacements = lines[replIndex+2:]
+        assert len(originals) == len(replacements), "Different number of originals and replacements"
+        replList = [(originals[i],replacements[i]) for i in range(len(originals))]
+
+
+    counter = Counter()
+    with enter_dir(csvDir):
+        for fName in os.listdir(os.getcwd()):           
+            if fName.endswith('.csv'):
+                with open(fName, mode = 'r', encoding = 'utf-8') as curCSV:
+                    csvStr = curCSV.read()
+                    revCSVStr = csvStr
+                    for repl in replList:
+                        if repl[0] in csvStr:
+                            counter.update([repl[0]])
+                            revCSVStr = revCSVStr.replace(repl[0], repl[1])
+            if revCSVStr == csvStr:
+                continue
+            else:
+                with open(fName, mode = 'w', encoding='utf-8') as curCSV:                            
+                    curCSV.write(revCSVStr)
+    
+    # Check that all replacements were made. Print warning to console.
+    for line in originals:
+        if line not in counter:
+            print("**********************************************************")
+            print("\tWARNING: Not all replacements were made.")
+            print("\tCheck replacements_table.csv for accuracy.")
+            print("\tLine not replaced:")
+            print(line)
+    
+    return counter
+    
+
+c = postProcessingReplacements('csvTest2')
+
+#testDF = pd.DataFrame({'NP':['2.0']})
+#pd.to_numeric(testDF['NP'], downcast = 'integer')
 # Testing 
