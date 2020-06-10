@@ -625,4 +625,4 @@ with change_dir(os.path.normpath(xls_dir)):
     print('word_list.csv created')
 
 # Replace post-processing errors itemized in replacements_table.csv
-# postProcessingReplacements(csvDir = 'csv')
+replCounter = postProcessingReplacements(csvDir = 'csv')
