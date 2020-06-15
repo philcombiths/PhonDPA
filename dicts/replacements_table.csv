@@ -20,10 +20,43 @@ t,eat it eat it,ˈit ɪt ˈit ɪt,iɾɪʔ,,Probe target 'eat' but child produced
 ʧ w,clock clock,ˈklɑk ˈklɑk,dɔk,,Probe target 'watch' but child produced 'clock',2,3920,4;10;8,PKP,PKP Pre
 ʃ,pulling pulling,ˈpʊlɪŋ ˈpʊlɪŋ,pʌlɪŋ,,Probe target 'pushing' but child produced 'pulling',2,3920,5;0;16,PKP,PKP Post
 s w,sweatshirt sweatshirt,ˈswɛtˌʃʊɹt ˈswɛtˌʃʊɹt,fwɛs̹ʊt,,Probe target 'sweater' but child produced 'sweatshirt',2,7055,4;1;29,OCP,OCP 2mo
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
+p,sleep,ˈslip,̂ͮ̾swip,,,,1776,3;7;10,PKP,PKP 2mo
+s p,wasp,ˈwɑsp,wɔːͮ̾,1,,,2426,4;6;19,CCP,CCP Post
+s p,gasp,ˈɡæsp,dæːͮ̾,1,,,2426,4;6;19,CCP,CCP Post
+ŋ,finger,ˈfɪŋɡʊɹ,̂ͮ̾θfɪŋɡʊ,,,,2920,6;0;16,GFTA,GFTA 2mo
+r ʤ,large,ˈlɑɹʤ,ᵇwɑʦ̪,,,,3079,4;0;26,CCP,CCP 2mo
+z,buzz,ˈbʌz,bʌːͥ,,,,3085,3;8;10,PKP,PKP Pre
+f,elephant,ˈɛləfɪnt,ɛləfɪ‚t,,,,3214,4;9;6,PKP,PKP Post
+θ,thirsty,ˈθʊɹsti,fɛː̂ɹsi,,,,3623,4;5;25,PKP,PKP 2
+g,wagon,ˈwæɡɪn,̂ɹwæɡɪ,,,,3694,5;2;3,PKP,PKP 2wk
+b,web-i,ˈwɛbi,ᵖ̵ʼwɛbi,,,,3920,5;1;2,PKP,PKP 2wk
+h,bluehouse,ˈbluhaʊs,ᶿ̵͒ˢ̵ːbwhaʊts,,,,4097,4;4;2,PKP,PKP 2mo
+m p,stamp,ˈstæmp,̂ͮ̾stæmpʼ,,,,4966,5;2;3,CCP,CCP 2mo
+t,bootie,ˈbuti,buːͥ,1,,,5202,3;7;1,PKP,PKP 2wk
+k l,cloud,ˈklaʊd,kaʊːͮ̾,,,,5497,3;8;1,OCP,OCP PS
+s p,wasp,ˈwɑsp,wɑːͮ̾,1,,,5772,3;1;4,CCP,CCP Pre
+s,santa,ˈsæntə,hæːͣ̾ə,,,,5772,3;2;21,PKP,INV PS
+z,nose,ˈnoʊz,noʊːͮs̪,,,,5863,4;8;25,Condition A TP,TP 4
+r l,curl,ˈkʊɹl,kʊːͮ̾,,,,7243,4;7;7,CCP,CCP 2mo
+l,light,ˈlaɪt,̃laɪt,,,,7243,4;7;7,PKP,PKP 2mo
+l f,laugh,ˈlæf,̃læf,,,,7243,4;7;7,PKP,PKP 2mo
+r f,nerf,ˈnʊɹf,nʊːͮ̾p,1,,,7250,7;7;22,CCP,CCP 2wk
+w,snowing,ˈsnoʊɪŋ,̂ͮ̾snoʊwɪnᵗ,,,,7482,3;6;17,PKP,PKP Pre
+w ʃ,wash,ˈwɑʃ,̂ɹwɑs,,,,7703,4;10;27,PKP,PKP Post
+k,kangaroo,ˌkæŋɡəˈɹu,ʴ̵ːkeɪndəɹu,,,,7921,4;5;5,TP,TP 3
+ʃ r,shrimp,ˈʃɹɪmp,ᵗ̵ᶴ̵̡̾̂ɹɪmp,1,,,7922,6;10;7,OCP,OCP BL 1
+n z,nose,ˈnoʊz,noʊːͮ̾,,,,8600,3;2;21,PKP,INV BL 1
+v ʃ,shave,ˈʃeɪv,̂ͮ̾tʃaɪv,,,,8636,4;11;2,PKP,PKP Pre
+ŋ k,pink,ˈpiŋk,pi(k,,,,9193,3;11;26,CCP,CCP Pre
+k w,quick,ˈkwɪk,tɪt[,1,,,9247,3;9;22,OCP,OCP PS
+s t,star,ˈstɑɹ,stɔːͥ,,,,9482,5;4;12,OCP,OCP Pre
+d,door door,ˈdɔɹ ˈdɔɹ,doʊː   ᵗ̵̳doʊ,,,2,9575,5;5;18,Condition A TP,TP 9
+r v,carve,ˈkɔɹv,kɔːͮ,1,,,9594,4;11;24,CCP,CCP 2mo
+ð,theirs,ˈðɛɹz,̥d̪ɛʊz̥,,,,9641,4;11;27,Condition B TP,TP 4
+ð,theirs,ˈðɛɹz,̥d̪oʊz̥,,,,9641,5;0;11,Condition B TP,TP 6
+ð,theirs,ˈðɛɹz,̥d̪oʊ,,,,9641,5;0;13,Condition B TP,TP 7
+θ,wreath,ˈɹiθ,wiːͮ̾,,,,9641,5;3;10,PKP,PKP 2mo
+ð,that,ˈðæt,ːɔt,1,,,9687,3;4;28,PKP,PKP Pre
 ,,,,,,,,,,
 ,,,,,,,,,,
 ,,,,,,,,,,
@@ -52,3 +85,40 @@ t,eat it,ˈit ɪt,iɾ ɪʔ,,Probe target 'eat' but child produced 'eat it',,2081
 ʧ w,clock,ˈklɑk,dɔk,,Probe target 'watch' but child produced 'clock',,3920,4;10;8,PKP,PKP Pre
 ʃ,pulling,ˈpʊlɪŋ,pʌlɪŋ,,Probe target 'pushing' but child produced 'pulling',,3920,5;0;16,PKP,PKP Post
 s w,sweatshirt,ˈswɛtˌʃʊɹt,fwɛs̹ʊt,,Probe target 'sweater' but child produced 'sweatshirt',,7055,4;1;29,OCP,OCP 2mo
+p,sleep,ˈslip,ˢ̵wͮ̾ip,,,,1776,3;7;10,PKP,PKP 2mo
+s p,wasp,ˈwɑsp,wɔͮ̾ː,1,,,2426,4;6;19,CCP,CCP Post
+s p,gasp,ˈɡæsp,dæͮ̾ː,1,,,2426,4;6;19,CCP,CCP Post
+ŋ,finger,ˈfɪŋɡʊɹ,ᶿ̵fͮ̾ɪŋɡʊ,,,,2920,6;0;16,GFTA,GFTA 2mo
+r ʤ,large,ˈlɑɹʤ,ᵇ̵wɑʦ̪,,,,3079,4;0;26,CCP,CCP 2mo
+z,buzz,ˈbʌz,bʌͥː,,,,3085,3;8;10,PKP,PKP Pre
+f,elephant,ˈɛləfɪnt,ɛləfɪt,,,,3214,4;9;6,PKP,PKP Post
+θ,thirsty,ˈθʊɹsti,fɛʴːsi,,,,3623,4;5;25,PKP,PKP 2
+g,wagon,ˈwæɡɪn,ʴ̵wæɡɪ,,,,3694,5;2;3,PKP,PKP 2wk
+b,web-i,ˈwɛbi,ᵖ̵ʼ̵wɛbi,,,,3920,5;1;2,PKP,PKP 2wk
+h,bluehouse,ˈbluhaʊs,ᶿ̵ˢ̵b͒͒whaʊts,,,,4097,4;4;2,PKP,PKP 2mo
+m p,stamp,ˈstæmp,sͮ̾tæmpʼ,,,,4966,5;2;3,CCP,CCP 2mo
+t,bootie,ˈbuti,buͥː,1,,,5202,3;7;1,PKP,PKP 2wk
+k l,cloud,ˈklaʊd,kaʊͮ̾ː,,,,5497,3;8;1,OCP,OCP PS
+s p,wasp,ˈwɑsp,wɑͮ̾ː,1,,,5772,3;1;4,CCP,CCP Pre
+s,santa,ˈsæntə,hæːəͣ̾,,,,5772,3;2;21,PKP,INV PS
+z,nose,ˈnoʊz,noʊːs̪ͮ,,,,5863,4;8;25,Condition A TP,TP 4
+r l,curl,ˈkʊɹl,kʊͮ̾ː,,,,7243,4;7;7,CCP,CCP 2mo
+l,light,ˈlaɪt,l̃aɪt,,,,7243,4;7;7,PKP,PKP 2mo
+l f,laugh,ˈlæf,l̃æf,,,,7243,4;7;7,PKP,PKP 2mo
+r f,nerf,ˈnʊɹf,nʊͮ̾ːp,1,,,7250,7;7;22,CCP,CCP 2wk
+w,snowing,ˈsnoʊɪŋ,sͮ̾noʊwɪnᵗ,,,,7482,3;6;17,PKP,PKP Pre
+w ʃ,wash,ˈwɑʃ,ʴ̵wɑs,,,,7703,4;10;27,PKP,PKP Post
+k,kangaroo,ˌkæŋɡəˈɹu,ʴ̵k͒eɪndəɹu,,,,7921,4;5;5,TP,TP 3
+ʃ r,shrimp,ˈʃɹɪmp,ʦ̡͜ɹɪmp,1,,,7922,6;10;7,OCP,OCP BL 1
+n z,nose,ˈnoʊz,noʊͮ̾ː,,,,8600,3;2;21,PKP,INV BL 1
+v ʃ,shave,ˈʃeɪv,ᵗ̵ʃͮ̾aɪv,,,,8636,4;11;2,PKP,PKP Pre
+ŋ k,pink,ˈpiŋk,pik,,,,9193,3;11;26,CCP,CCP Pre
+k w,quick,ˈkwɪk,tɪt,1,,,9247,3;9;22,OCP,OCP PS
+s t,star,ˈstɑɹ,stɔͥː,,,,9482,5;4;12,OCP,OCP Pre
+d,door door,ˈdɔɹ ˈdɔɹ,doʊː ᵗ̵d̳oʊ,,,2,9575,5;5;18,Condition A TP,TP 9
+r v,carve,ˈkɔɹv,kɔͮː,1,,,9594,4;11;24,CCP,CCP 2mo
+ð,theirs,ˈðɛɹz,d̥̪ɛʊz̥,,,,9641,4;11;27,Condition B TP,TP 4
+ð,theirs,ˈðɛɹz,d̥̪oʊz̥,,,,9641,5;0;11,Condition B TP,TP 6
+ð,theirs,ˈðɛɹz,d̥̪oʊ,,,,9641,5;0;13,Condition B TP,TP 7
+θ,wreath,ˈɹiθ,wiͮ̾ː,,,,9641,5;3;10,PKP,PKP 2mo
+ð,that,ˈðæt,ɔːt,1,,,9687,3;4;28,PKP,PKP Pre

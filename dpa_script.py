@@ -598,11 +598,11 @@ with change_dir(os.path.normpath(xls_dir)):
             os.makedirs('info')
             print('Created:', os.path.join(os.getcwd(),'info'))
         except WindowsError:
-            print('info directory already created.')
+            print('info directory already found')
         # Change to new subdirectory
         with change_dir(os.path.join(cwd, 'info')):                                            
                 df_replace_counts.T.to_csv('replacement_counts.csv', encoding = 'utf-8')
-    print('replacement_counts.csv created')
+    print('\treplacement_counts.csv created')
                             
     ### Other features to implement in future:                     
     # Add info from notes_dict to participant metadata/phon corpus, CA
@@ -617,12 +617,12 @@ with change_dir(os.path.normpath(xls_dir)):
             os.makedirs('info')
             print('Created:', os.path.join(os.getcwd(),'info'))
         except WindowsError:
-            print('info/{} directory already created.'.format(name))
+            print('info directory found')
         # Change to new subdirectory
         with change_dir(os.path.join(cwd, 'info')):                                            
                 pd.DataFrame(word_list).to_csv('word_list.csv', header = ['Orthography'], 
                             encoding = 'utf-8', index = False)
-    print('word_list.csv created')
+    print('\tword_list.csv created')
 
 # Replace post-processing errors itemized in replacements_table.csv
 replCounter = postProcessingReplacements(csvDir = 'csv')

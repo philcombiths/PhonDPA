@@ -464,6 +464,10 @@ def postProcessingReplacements(csvDir = 'csv'):
         lines = f.readlines()
         # Remove trailing whitespace and commas from rows
         lines = [i.strip().strip(',') for i in lines]
+        # Fix NumProductions numbers
+        ### If replacements are added with other values for NumReplacements,
+        ### repeat this step for each
+        lines = [i.replace(",2,", ",2.0,") for i in lines] 
         # Remove empty rows
         lines = [i for i in lines if i]
         # Find row index for original and replacement rows
@@ -471,10 +475,12 @@ def postProcessingReplacements(csvDir = 'csv'):
         replIndex = lines.index('Replacement rows go here:')
         originals = lines[origIndex+2:replIndex]
         replacements = lines[replIndex+2:]
-        assert len(originals) == len(replacements), "Different number of originals and replacements"
+        assert len(originals) == len(replacements), "ERROR: Different number of originals and replacements"
         replList = [(originals[i],replacements[i]) for i in range(len(originals))]
 
-
+    print("****************************************************************")
+    print("Post-processing...")
+    print(f"Replacing {len(originals)} lines in csv files...")
     counter = Counter()
     with enter_dir(csvDir):
         for fName in os.listdir(os.getcwd()):           
@@ -486,6 +492,8 @@ def postProcessingReplacements(csvDir = 'csv'):
                         if repl[0] in csvStr:
                             counter.update([repl[0]])
                             revCSVStr = revCSVStr.replace(repl[0], repl[1])
+            else:
+                continue
             if revCSVStr == csvStr:
                 continue
             else:
@@ -495,16 +503,16 @@ def postProcessingReplacements(csvDir = 'csv'):
     # Check that all replacements were made. Print warning to console.
     for line in originals:
         if line not in counter:
-            print("**********************************************************")
+            print("\t*********************************************")
             print("\tWARNING: Not all replacements were made.")
             print("\tCheck replacements_table.csv for accuracy.")
             print("\tLine not replaced:")
             print(line)
     
+    print("****************************************************************")
+    print("Post-processing complete!")
     return counter
     
-
-c = postProcessingReplacements('csvTest2')
 
 #testDF = pd.DataFrame({'NP':['2.0']})
 #pd.to_numeric(testDF['NP'], downcast = 'integer')

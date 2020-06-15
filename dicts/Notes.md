@@ -1,0 +1,1 @@
+Apostrophe in 'other_chars_translate_dict.csv' may not appear in spreadsheet viewers
