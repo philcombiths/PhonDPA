@@ -512,8 +512,6 @@ def postProcessingReplacements(csvDir = 'csv'):
     print("****************************************************************")
     print("Post-processing complete!")
     return counter
-    
 
-#testDF = pd.DataFrame({'NP':['2.0']})
-#pd.to_numeric(testDF['NP'], downcast = 'integer')
-# Testing 
+### Testing 
+#replCounter = postProcessingReplacements(csvDir = 'csv')
