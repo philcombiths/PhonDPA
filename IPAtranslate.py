@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 """
 Modification/addition to code created by Mark Hasegawa-Johnson @jhasegaw
-Purpose: From a directory containing text files, translate symbols in 
+Purpose: Primarily for making transcription datasets more readable in R.
+         From a directory containing text files, translate symbols in 
          each text file to/from IPA/X-SAMPA and save as new txt
          file (filename appended with new symbol type).
          
@@ -50,7 +51,7 @@ _xsampa2ipa = {
         'l\\':'ɺ',
         'm':'m',
         'n':'n',
-        'n_d':'nd',
+        # 'n_d':'nd',
         'n`':'ɳ',
         'o':'o',
         'p':'p',
@@ -100,7 +101,7 @@ _xsampa2ipa = {
         'M':'ɯ',
         'M\\':'ɰ',
         'N':'ŋ',
-        'N_g':'ŋɡ',
+        # 'N_g':'ŋɡ',
         'N\\':'ɴ',
         'O':'ɔ',
         'O\\':'ʘ',
