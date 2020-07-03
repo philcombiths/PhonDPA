@@ -155,7 +155,9 @@ _xsampa2ipa = {
         '||':'‖',
         '|\\|\\':'ǁ',
         '=\\':'ǂ',
-        '-\\':'‿'
+        '-\\':'‿',
+        # NOT X-SAMPA but temporary substitute of len(1)
+        'C':'ʧ'
     }.items()
 }
 
