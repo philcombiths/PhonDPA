@@ -282,8 +282,6 @@ def reDiac():
     Return compiled regex pattern
     """
     
-    assert type(text) is str   
-    
     unicodeBlockList = [r'\p{InCombining_Diacritical_Marks_for_Symbols}',
                         r'\p{InSuperscripts_and_Subscripts}',
                         r'\p{InCombining_Diacritical_Marks}',
@@ -291,7 +289,7 @@ def reDiac():
                         r'\p{InCombining_Diacritical_Marks_Extended}'
                         r'\p{InCombining_Diacritical_Marks_Supplement}']
 
-    additionalChars = [r'ᴸ', r'ᵇ', r':', r'<', r'←', r'=', r"'", r"‚"]
+    additionalChars = [r'ᴸ', r'ᵇ', r':', r'<', r'←', r'=', r"'", r"‚", r"ᵊ"]
 
     pattern = r'(' + r'|'.join(unicodeBlockList+additionalChars) + r')'
     pattern = re.compile(pattern)
