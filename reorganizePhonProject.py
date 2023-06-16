@@ -1,19 +1,26 @@
-# -*- coding: utf-8 -*-
-# Python 3.7
+
 """
-With a specified Phon Project directory containing at least once corpus,
+With a specified Phon Project directory containing at least one corpus,
 generates new corpora and filters Phon sessions into those corpora
 based on specified keywords and filter words.
 
 This generates new corpora folders. Does NOT modify original corpora folders.
 
+reorganizePhonProject is the most current function.
+
 Designed for use with DPA Project
+
+@author: Philip Combiths
+@created: 2020-11-25
+@modified: 2023-06-16
 """
 
-import os,os.path,shutil,fnmatch
-from contextlib import contextmanager
+import fnmatch
+import os
+import os.path
 import re
-
+import shutil
+from contextlib import contextmanager
 
 #------------------------------------------------------------------------------
 
@@ -36,8 +43,12 @@ def enter_dir(newdir):
     finally:
         os.chdir(prevdir)
         
-    
 def organize_files_by_keyword(keyword):
+    """Create a new corpus filtered to session names containing keywork.
+
+    Args:
+        keyword (STR): String to use as corpus name and session filter.
+    """
     # Working in corpus folder
     projectDir = os.path.dirname(os.getcwd())
     PhonDir = os.path.dirname(projectDir)
@@ -66,6 +77,14 @@ def organize_files_by_keyword(keyword):
                 
             
 def organize_files_by_regex(keyword):
+    """Create a new corpus filtered to one of 1000s, 2000s, 3000s, etc.
+
+    Args:
+        keyword (_type_): Single digit to specify sessions. Example: (1)000s, (2)000s.
+
+    Returns:
+        STR: String of corpus name.
+    """
     # Working in corpus folder
     projectDir = os.path.dirname(os.getcwd())
     PhonDir = os.path.dirname(projectDir)
@@ -92,7 +111,15 @@ def organize_files_by_regex(keyword):
                 
             
 def organize(corpusKey = None):
-       
+    """Create new corpora based on groups of participant numbers or specified keyword.
+
+    Args:
+        corpusKey (STR, optional): String to use as corpus name and session filter. 
+        Defaults to None.
+
+    Returns:
+        None
+    """
     # If no corpusKey is specified, sessions are grouped in corpuses
     # by participant number (e.g., 1000s, 2000s, 3000s)
     # This saves into the same folder as the current corpus.   
@@ -116,24 +143,27 @@ def organize(corpusKey = None):
         return
 
 def reorganizePhonProject(projectDir, corpusKey=None, filterKey=None):
+    """_summary_
 
-    with enter_dir(os.path.join('Phon', projectDir)):
-        
+    Args:
+        projectDir (_type_): _description_
+        corpusKey (_type_, optional): _description_. Defaults to None.
+        filterKey (_type_, optional): _description_. Defaults to None.
+    """
+    with change_dir(os.path.normpath(projectDir)):
+
         assert 'project.xml' in os.listdir(), "project.xml not found in project directory"
         
-        # First sorting pass
+        # First sorting pass. Organize in participant number buckets.
         for f in os.listdir():
             if os.path.isdir(f):
-                # Enter corpus folder
+                # Enter corpus folder(s)
                 with enter_dir(f):
                     if corpusKey == None:
                         corpusKey = organize(corpusKey)
                     else:
                         organize(corpusKey)
-                    
-
-                   
-        # Second filter pass
+        # Second filter pass. Filter by filterKey.
         if filterKey != None:            
             
             for corpus in corpusKey:
@@ -154,9 +184,11 @@ def reorganizePhonProject(projectDir, corpusKey=None, filterKey=None):
     return
 
 
-
+# Examples
 #reorganizePhonProject('DPA 3.0 - Original - Copy', ['Pre', 'Post'], ['PKP', 'OCP', 'CCP'])
-reorganizePhonProject('DPA 3.0 - Original - Copy', filterKey=['PKP', 'GFTA'])
+#reorganizePhonProject('DPA 3.0 - Original - Copy', filterKey=['PKP', 'GFTA'])
+reorganizePhonProject('/Users/pcombiths/Documents/DPA v1_4 all 2', filterKey=['PKP'])
+
 
 #with change_dir(os.path.normpath(root_directory)):
 #    organize(7) # Set option number
