@@ -5,7 +5,8 @@ based on specified keywords and filter words.
 
 This generates new corpora folders. Does NOT modify original corpora folders.
 
-reorganizePhonProject is the most current function.
+organize_project() is the most current function for automatic organization by participant number.
+
 
 Designed for use with DPA Project.
 
@@ -23,7 +24,7 @@ The purpose of the post_select option is to handle scenarios where there are mul
 
 @author: Philip Combiths
 @created: 2020-11-25
-@modified: 2023-06-16
+@modified: 2023-06-26
 """
 
 import fnmatch
@@ -55,43 +56,8 @@ def enter_dir(newdir):
         os.chdir(prevdir)
 
 
-def organize_files_by_keyword(keyword):
-    """
-    Creates a new corpus filtered to session names containing the specified keyword.
-
-    Args:
-        keyword (str): String to use as the corpus name and session filter.
-
-    Returns:
-        tuple: A tuple containing the PhonDir (parent directory of the project) and the newCorpusDir (path to the created corpus directory).
-    """
-    # Working in corpus folder
-    projectDir = os.path.dirname(os.getcwd())
-    PhonDir = os.path.dirname(projectDir)
-    newCorpusDir = os.path.join(projectDir, keyword)
-
-    # Create new corpus folder from keyword
-    try:
-        os.mkdir(newCorpusDir)
-    except FileExistsError:
-        print(f"{keyword} directory already exists. Adding to folder")
-
-    for File in os.listdir():
-        # If the name of the file contains a keyword
-        if fnmatch.fnmatch(File, "*" + keyword + "*"):
-            print(f"{File} Copied to {keyword} Directory")
-            # If the file is truly a file...
-            if os.path.isfile(File):
-                # Copy that file to the new corpus directory
-                try:
-                    shutil.copy(File, newCorpusDir)
-                except shutil.SameFileError:
-                    continue
-
-    return PhonDir, newCorpusDir
-
-
-def organize_files_by_regex(keyword):
+# Helper function for organize_corpus()
+def organize_files_by_regex(project_directory, keyword):
     """Create a new corpus filtered to one of 1000s, 2000s, 3000s, etc.
 
     Args:
@@ -101,7 +67,7 @@ def organize_files_by_regex(keyword):
         STR: String of corpus name.
     """
     # Working in corpus folder
-    projectDir = os.path.dirname(os.getcwd())
+    projectDir = project_directory
     PhonDir = os.path.dirname(projectDir)
     # Create the new corpus name based on the keyword
     newCorpusName = keyword + "000s"
@@ -113,157 +79,57 @@ def organize_files_by_regex(keyword):
         print(f"{newCorpusName} directory already exists. Adding to folder")
 
     # Iterate over files in the current directory
-    for File in os.listdir():
+    for File in os.listdir(project_directory):
+        file_path = os.path.join(project_directory, File)
         reg_exp = re.compile(keyword + r"\d{3}")
         # If the name of the file contains a keyword
         if re.search(reg_exp, File):
-            print(f"{File} Copied to {newCorpusName} Directory")
             # If the file is truly a file...
-            if os.path.isfile(File):
+            if os.path.isfile(file_path):
                 try:
-                    shutil.copy(File, newCorpusDir)
+                    shutil.copy(file_path, newCorpusDir)
+                    print(f"{File} Copied to {newCorpusName} Directory")
                 except shutil.SameFileError:
+                    print(f"{File} already exists. Not copied")
                     continue
     return newCorpusName
 
 
-def organize(corpusKey=None):
+# Helper function for organize_corpus()
+def organize():
     """
-    Creates new corpora based on groups of participant numbers or a specified keyword.
-
-    Args:
-        corpusKey (str or list, optional): String or list of strings to use as corpus name(s) and session filter(s).
-            If not specified (None), sessions are grouped into corpora based on participant numbers (e.g., 1000s, 2000s, 3000s).
-            If a single string is provided, files containing the specified keyword will be organized into a corpus.
-            If a list of strings is provided, files containing any of the specified keywords will be organized into separate corpora.
-            Defaults to None.
+    Creates new corpora in the current folder based on groups of participant
+    numbers (1000s, 2000s, etc.).
 
     Returns:
-        None or list: If corpusKey is None, it returns a list of corpus names created based on participant numbers.
-            If corpusKey is specified, it returns None.
+        list: A list of corpus names created based on participant numbers.
     """
 
-    if corpusKey == None:
-        # If no corpusKey is specified, sessions are grouped in corpora
-        # based on participant number (e.g., 1000s, 2000s, 3000s)
-        # This saves into the same folder as the current corpus.
-        corpusNames = []
-        for keyword in range(1, 10):
-            keyword = str(keyword)
-            corpusNames.append(organize_files_by_regex(keyword))
-            # Calls the helper function 'organize_files_by_regex' for each participant number keyword
-            # Appends the returned corpus name to the 'corpusNames' list
-
-        return corpusNames
-        # Returns the list of corpus names created based on participant numbers
-
-    # Organize into corpora by keyword(s)
-    else:
-        if isinstance(corpusKey, str):
-            organize_files_by_keyword(corpusKey)
-            # Calls the helper function 'organize_files_by_keyword' with the provided keyword
-        else:
-            for corpus in corpusKey:
-                organize_files_by_keyword(corpus)
-                # Calls the helper function 'organize_files_by_keyword' for each keyword in the provided list
-
-        return
+    corpusNames = []
+    for keyword in range(1, 10):
+        keyword = str(keyword)
+        corpusNames.append(organize_files_by_regex(keyword))
+        # Calls the helper function 'organize_files_by_regex' for each participant number keyword
+        # Appends the returned corpus name to the 'corpusNames' list
+    return corpusNames
+    # Returns the list of corpus names created based on participant numbers
 
 
-corpusNames = []
-for keyword in range(1, 10):
-    keyword = str(keyword)
-    corpusNames.append(organize_files_by_regex(keyword))
-
-
-# Working in corpus folder
-projectDir = os.path.dirname(os.getcwd())
-PhonDir = os.path.dirname(projectDir)
-newCorpusDir = os.path.join(projectDir, keyword)
-
-# Create new corpus folder from keyword
-
-
-def organize_project(project_directory):
-    with change_dir(os.path.normpath(projectDir)):
-        for f in os.listdir():
-            if os.path.isdir(f):
-                # Enter corpus folder(s)
-                with enter_dir(f):
-                    for corpus_name in corpusNames:
-                        try:
-                            os.mkdir(newCorpusDir)
-                        except FileExistsError:
-                            print(
-                                f"{keyword} directory already exists. Adding to folder"
-                            )
-
-                        for File in os.listdir():
-                            # If the name of the file contains a keyword
-                            if fnmatch.fnmatch(File, "*" + keyword + "*"):
-                                print(f"{File} Copied to {keyword} Directory")
-                                # If the file is truly a file...
-                                if os.path.isfile(File):
-                                    # Copy that file to the new corpus directory
-                                    try:
-                                        shutil.copy(File, newCorpusDir)
-                                    except shutil.SameFileError:
-                                        continue
-
+# Use this function to organize a corpusby 1000s, 2000s, etc.
+def organize_corpus(corpus_directory):
+    corpusNames = []
+    for keyword in range(1, 10):
+        keyword = str(keyword)
+        corpusNames.append(organize_files_by_regex(corpus_directory, keyword))
     return
 
 
-def reorganizePhonProject(projectDir, corpusKey=None, filterKey=None):
-    """_summary_
-
-    Args:
-        projectDir (_type_): _description_
-        corpusKey (_type_, optional): _description_. Defaults to None.
-        filterKey (_type_, optional): _description_. Defaults to None.
-    """
-    with change_dir(os.path.normpath(projectDir)):
-        assert (
-            "project.xml" in os.listdir()
-        ), "project.xml not found in project directory"
-
-        # First sorting pass. Organize in participant number buckets.
-        for f in os.listdir():
-            if os.path.isdir(f):
-                # Enter corpus folder(s)
-                with enter_dir(f):
-                    if corpusKey == None:
-                        corpusKey = organize(corpusKey)
-                    else:
-                        organize(corpusKey)
-        # Second filter pass. Filter by filterKey.
-        if filterKey != None:
-            for corpus in corpusKey:
-                with enter_dir(corpus):
-                    print(f"Deleting {corpus} sessions not in filterKey...")
-                    for f in os.listdir():
-                        if any(
-                            [fnmatch.fnmatch(f, "*" + fil + "*") for fil in filterKey]
-                        ):
-                            continue
-                        else:
-                            # Check if file exists:
-                            if os.path.isfile(f):
-                                os.remove(f)
-                            else:
-                                print(f"ERROR: {f} Not found in {corpus} Directory")
-
-                    print(
-                        f"{len(os.listdir())} Phon sessions copied to {corpus} corpus."
-                    )
-
-    return
-
-
-def derive_corpus(
+# Use this function to filter and organize an entire project by keyword lists
+def derive_project(
     session_directory, corpus_filter, session_filter, pre_select=1, post_select=0
 ):
     """
-    Derives a corpus based on the given filters.
+    Derives a project based on the given filters.
 
     Args:
         session_directory (str): The directory path of the session.
@@ -341,7 +207,8 @@ def derive_corpus(
     return
 
 
-# derive_corpus(
+## Input must be a PROJECT folder
+# derive_project(
 #     r"R:\Admin\Alt Workspace\DPA v1_4 all - Copy",
 #     ["Pre", "Post"],
 #     ["PKP", "OCP", "CCP", "GFTA"],
@@ -349,7 +216,8 @@ def derive_corpus(
 #     post_select=0,
 # )
 
-organize_project(r"R:\Admin\Alt Workspace\DPA")
+## The directory path given here must a CORPUS directory (Phon sessions inside)
+organize_corpus(r"R:\Admin\Alt Workspace\DPA v1_6_PrePost\Pre")
 
 ### ToDo
 # Output to a new Phon project, rather than inside the same directory
